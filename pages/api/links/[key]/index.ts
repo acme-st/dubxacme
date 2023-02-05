@@ -2,17 +2,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { deleteLink, editLink } from "@/lib/api/links";
 import { Session, withUserAuth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { isBlacklistedDomain } from "@/lib/utils";
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "1500kb",
-    },
-  },
-};
-
-const domain = "dub.sh";
+const domain = "acme.st";
 
 export default withUserAuth(
   async (req: NextApiRequest, res: NextApiResponse, session: Session) => {
@@ -40,10 +31,6 @@ export default withUserAuth(
           .status(400)
           .json({ error: "Missing key or url or title or timestamp" });
       }
-      const domainBlacklisted = await isBlacklistedDomain(url);
-      if (domainBlacklisted) {
-        return res.status(400).json({ error: "Invalid url" });
-      }
       const response = await editLink(
         {
           domain,
@@ -51,6 +38,7 @@ export default withUserAuth(
           userId: session.user.id,
         },
         oldKey,
+        "acmest",
       );
       if (response === null) {
         return res.status(400).json({ error: "Key already exists" });

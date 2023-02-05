@@ -1,26 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { withProjectAuth } from "@/lib/auth";
-import { getStats } from "@/lib/stats";
+import { redis } from "@/lib/upstash";
 
 export default withProjectAuth(
   async (req: NextApiRequest, res: NextApiResponse) => {
-    // GET /api/projects/[slug]/domains/[domain]/root/clicks - get # of clicks on root of domain (e.g. dub.sh, vercel.fyi)
-    if (req.method === "GET") {
-      const { domain } = req.query as {
-        domain: string;
-      };
-      const response = await getStats({
-        domain,
-        key: "_root",
-        endpoint: "clicks",
-      });
+    const { domain } = req.query as { domain: string };
 
-      let clicks = 0;
-      try {
-        clicks = response[0]["count()"];
-      } catch (e) {
-        console.log(e);
-      }
+    // GET /api/projects/[slug]/domains/[domain]/root/clicks - get number of clicks on root domain
+    if (req.method === "GET") {
+      const clicks =
+        domain === "acme.st"
+          ? await redis.get("acme.st:root:clicks") // we store acme.st root clicks in a string instead of zset because it has a ton of clicks
+          : await redis.zcard(`${domain}:root:clicks`);
       return res.status(200).json(clicks);
     } else {
       res.setHeader("Allow", ["GET"]);

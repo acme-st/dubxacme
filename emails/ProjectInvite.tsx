@@ -25,15 +25,15 @@ export default function ProjectInvite({
       <Head />
       <MjmlBody width={500}>
         <MjmlWrapper cssClass="container">
-          <Header title="Your Dub Invite" />
+          <Header title="Your ACMEST Invite" />
           <MjmlSection cssClass="smooth">
             <MjmlColumn>
               <MjmlText cssClass="paragraph">
                 You've been invited to join the <strong>{projectName}</strong>{" "}
-                project on Dub!
+                project on ACMEST!
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                You can use the magic link below to sign in to Dub and join the
+                You can use the magic link below to sign in to ACMEST and join the
                 project.
               </MjmlText>
               <ButtonPrimary link={url} uiText="Join Project" />

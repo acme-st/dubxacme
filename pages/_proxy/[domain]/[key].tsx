@@ -1,11 +1,10 @@
-import Image from "next/image";
+import Image from "next/future/image";
 import Head from "next/head";
 import { unescape } from "html-escaper";
 import prisma from "@/lib/prisma";
 import { getApexDomain } from "@/lib/utils";
 
 export default function LinkPage({
-  shortLink,
   fullDomain,
   apexDomain,
   title,
@@ -19,19 +18,11 @@ export default function LinkPage({
         <meta property="og:site_name" content={unescape(fullDomain)} />
         <meta property="og:description" content={unescape(description)} />
         <meta property="og:image" content={unescape(image)} />
-        <meta
-          property="og:image:alt"
-          content={`OG image for ${unescape(title)} (${shortLink})`}
-        />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content={unescape(fullDomain)} />
         <meta name="twitter:title" content={unescape(title)} />
         <meta name="twitter:description" content={unescape(description)} />
         <meta name="twitter:image" content={unescape(image)} />
-        <meta
-          property="twitter:image:alt"
-          content={`OG image for ${unescape(title)} (${shortLink})`}
-        />
         <meta charSet="utf-8" />
         <link
           rel="icon"
@@ -70,7 +61,14 @@ export default function LinkPage({
   );
 }
 
-export async function getServerSideProps(ctx) {
+export function getStaticPaths() {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+}
+
+export async function getStaticProps(ctx) {
   const { domain, key } = ctx.params as { domain: string; key: string };
   const link = await prisma.link.findUnique({
     where: {
@@ -86,12 +84,14 @@ export async function getServerSideProps(ctx) {
   if (!url) {
     return {
       notFound: true,
+      revalidate: 1,
     };
   } else if (!image) {
     return {
       redirect: {
         destination: url,
       },
+      revalidate: 1,
     };
   }
 
@@ -100,12 +100,12 @@ export async function getServerSideProps(ctx) {
 
   return {
     props: {
-      shortLink: `${domain}/${key}`,
       fullDomain,
       apexDomain,
       title,
       description,
       image,
     },
+    revalidate: 300,
   };
 }

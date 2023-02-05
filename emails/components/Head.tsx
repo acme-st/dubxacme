@@ -36,10 +36,6 @@ export default function Head(): JSX.Element {
         .title > * {
           font-size: 24px !important;
         }
-        .subtitle > * {
-          font-size: 16px !important;
-          font-weight: 700;
-        }
         .paragraph > * {
           font-size: 14px !important;
           line-height: 24px !important;
@@ -94,9 +90,6 @@ export default function Head(): JSX.Element {
             filter: invert(1) !important;
           }
           .title > * {
-            color: #fff !important;
-          }
-          .subtitle > * {
             color: #fff !important;
           }
           .paragraph > *, .li > * {

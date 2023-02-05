@@ -1,12 +1,6 @@
-import {
-  NextFetchEvent,
-  NextRequest,
-  NextResponse,
-  userAgent,
-} from "next/server";
+import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 import { detectBot, parse } from "@/lib/middleware/utils";
-import { redis } from "@/lib/upstash";
-import { recordClick } from "@/lib/tinybird";
+import { recordClick, redis } from "@/lib/upstash";
 
 export default async function LinkMiddleware(
   req: NextRequest,
@@ -23,32 +17,24 @@ export default async function LinkMiddleware(
     url: string;
     password?: boolean;
     proxy?: boolean;
-    ios?: string;
-    android?: string;
   }>(`${domain}:${key}`);
-  const { url: target, password, proxy, ios, android } = response || {};
+  const { url: target, password, proxy } = response || {};
 
   if (target) {
     // special case for link health monitoring with planetfall.io :)
-    if (!req.headers.get("dub-no-track")) {
-      ev.waitUntil(recordClick(domain, req, key)); // track the click only if there is no `dub-no-track` header
+    if (!req.headers.get("acmest-no-track")) {
+      ev.waitUntil(recordClick(domain, req, key)); // track the click only if there is no `acmest-no-track` header
     }
 
-    if (password) {
-      // rewrite to auth page (/_auth/[domain]/[key]) if the link is password protected
+    if (password && !req.cookies.get("acmest_authenticated")) {
+      // rewrite to auth page (/_auth/[domain]/[key]) if the link is password protected and the user has not authenticated before
       return NextResponse.rewrite(new URL(`/_auth/${domain}/${key}`, req.url));
     }
 
     const isBot = detectBot(req);
     if (isBot && proxy) {
-      // rewrite to proxy page (/_proxy/[domain]/[key]) if it's a bot
-      return NextResponse.rewrite(new URL(`/_proxy/${domain}/${key}`, req.url));
-    } else if (ios && userAgent(req).os?.name === "iOS") {
-      // redirect to iOS link if it is specified and the user is on an iOS device
-      return NextResponse.redirect(ios);
-    } else if (android && userAgent(req).os?.name === "Android") {
-      // redirect to Android link if it is specified and the user is on an Android device
-      return NextResponse.redirect(android);
+      // rewrite to proxy page (acme.st/_proxy/[domain]/[key]) if it's a bot
+      return NextResponse.rewrite(`https://acme.st/_proxy/${domain}/${key}`);
     } else {
       return NextResponse.redirect(target);
     }

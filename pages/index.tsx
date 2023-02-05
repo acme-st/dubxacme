@@ -1,8 +1,7 @@
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
-import prisma from "@/lib/prisma";
 import { useStatsModal } from "@/components/app/modals/stats-modal";
-import Background from "@/components/shared/background";
+import Background from "@/components/home/background";
 import Demo from "@/components/home/demo";
 import Features from "@/components/home/features";
 import Globe from "@/components/home/globe";
@@ -10,19 +9,8 @@ import Hero from "@/components/home/hero";
 import Logos from "@/components/home/logos";
 import Pricing from "@/components/home/pricing";
 import HomeLayout from "@/components/layout/home";
-import OSS from "@/components/home/oss";
-import Testimonials from "@/components/home/testimonials";
-import getTweetsMetadata, { homepageTweets } from "@/lib/twitter";
 
-export default function Home({
-  userCount,
-  stars,
-  tweets,
-}: {
-  userCount: number;
-  stars: number;
-  tweets: any;
-}) {
+export default function Home({ stars }: { stars: number }) {
   const router = useRouter();
   const { key: stats } = router.query;
   const { setShowStatsModal, StatsModal } = useStatsModal();
@@ -52,23 +40,24 @@ export default function Home({
       <div className="z-10">
         <Hero />
         <Demo />
+        {/*
         <Logos />
+        */}
         <Globe />
-        <Features />
-        <Testimonials userCount={userCount} tweets={tweets} />
+        {/*
+        <Features stars={stars} />
         <Pricing />
-        <OSS stars={stars} />
+        */}
       </div>
       <Background />
     </HomeLayout>
   );
 }
 
+{/*
 export async function getStaticProps() {
-  const userCount = await prisma.user.count();
-
   const { stargazers_count: stars } = await fetch(
-    "https://api.github.com/repos/steven-tey/dub",
+    "https://api.github.com/",
     {
       // optional – feel free to remove if you don't want to display star count
       ...(process.env.GITHUB_OAUTH_TOKEN && {
@@ -80,14 +69,11 @@ export async function getStaticProps() {
     },
   ).then((res) => res.json());
 
-  const tweets = await getTweetsMetadata(homepageTweets);
-
   return {
     props: {
-      userCount,
       stars,
-      tweets,
     },
-    revalidate: 60,
+    revalidate: 10,
   };
 }
+*/}

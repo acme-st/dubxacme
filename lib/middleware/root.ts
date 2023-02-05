@@ -1,9 +1,6 @@
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
-import { redis } from "@/lib/upstash";
-import { HOME_HOSTNAMES } from "@/lib/constants";
-import { recordClick } from "@/lib/tinybird";
+import { recordClick, redis } from "@/lib/upstash";
 import { parse } from "./utils";
-import { RootDomainProps } from "../types";
 
 export default async function RootMiddleware(
   req: NextRequest,
@@ -15,22 +12,30 @@ export default async function RootMiddleware(
     return NextResponse.next();
   }
 
-  if (HOME_HOSTNAMES.has(domain) || domain.endsWith(".vercel.app")) {
+  if (
+    domain === "acme.st" ||
+    domain === "preview.acme.st" ||
+    domain.endsWith(".vercel.app")
+  ) {
+    ev.waitUntil(redis.incr("acme.st:root:clicks")); // increment root clicks (only for acme.st)
+  } else {
+    ev.waitUntil(recordClick(domain, req)); // record clicks on root page (if domain is not acme.st)
+  }
+
+  if (
+    domain === "acme.st" ||
+    domain === "preview.acme.st" ||
+    domain.endsWith(".vercel.app")
+  ) {
     return NextResponse.next();
   } else {
-    ev.waitUntil(recordClick(domain, req)); // record clicks on root page (if domain is not dub.sh)
-
-    const { target, rewrite } =
-      (await redis.get<RootDomainProps>(`root:${domain}`)) || {};
+    const target = await redis.get<string>(`root:${domain}`);
     if (target) {
-      if (rewrite) {
-        return NextResponse.rewrite(target);
-      } else {
-        return NextResponse.redirect(target);
-      }
+      return NextResponse.redirect(target);
     } else {
-      // rewrite to root page unless the user defines a site to redirect to
-      return NextResponse.rewrite(new URL(`/_root/${domain}`, req.url));
+      const url = req.nextUrl;
+      url.pathname = `/placeholder/${domain}`; // rewrite to a /placeholder page unless the user defines a site to redirect to
+      return NextResponse.rewrite(url);
     }
   }
 }

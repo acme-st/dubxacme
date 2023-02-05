@@ -5,7 +5,6 @@ import WelcomeEmail from "emails/WelcomeEmail";
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import prisma from "@/lib/prisma";
-import { getBlackListedEmails } from "@/lib/utils";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
@@ -14,7 +13,7 @@ export const authOptions: NextAuthOptions = {
     EmailProvider({
       sendVerificationRequest({ identifier, url }) {
         sendMail({
-          subject: "Your Dub.sh Login Link",
+          subject: "Your acme.st Login Link",
           to: identifier,
           component: <LoginLink url={url} />,
         });
@@ -31,29 +30,12 @@ export const authOptions: NextAuthOptions = {
         sameSite: "lax",
         path: "/",
         // When working on localhost, the cookie domain must be omitted entirely (https://stackoverflow.com/a/1188145)
-        domain: VERCEL_DEPLOYMENT ? ".dub.sh" : undefined,
+        domain: VERCEL_DEPLOYMENT ? ".acme.st" : undefined,
         secure: VERCEL_DEPLOYMENT,
       },
     },
   },
   callbacks: {
-    signIn: async ({ user }) => {
-      const BLACKLISTED_EMAILS = await getBlackListedEmails();
-      if (BLACKLISTED_EMAILS.has(user.email)) {
-        return false;
-      }
-      return true;
-    },
-    jwt: async ({ token, account }) => {
-      const BLACKLISTED_EMAILS = await getBlackListedEmails();
-      if (BLACKLISTED_EMAILS.has(token.email)) {
-        return {};
-      }
-      if (account) {
-        token.accessToken = account.access_token;
-      }
-      return token;
-    },
     session: async ({ session, token }) => {
       session.user = {
         // @ts-ignore
@@ -69,7 +51,7 @@ export const authOptions: NextAuthOptions = {
         const email = message.user.email;
         await Promise.all([
           sendMarketingMail({
-            subject: "✨ Welcome to Dub",
+            subject: "✨ Welcome to acmest",
             to: email,
             component: <WelcomeEmail />,
           }),

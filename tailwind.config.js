@@ -6,14 +6,10 @@ module.exports = {
     "./pages/**/*.{js,ts,jsx,tsx}",
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
-  future: {
-    hoverOnlyWhenSupported: true,
-  },
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-satoshi)", "system-ui", "sans-serif"],
-        default: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["Satoshi-Variable, system-ui", "sans-serif"],
       },
       animation: {
         // Tooltip
@@ -23,7 +19,7 @@ module.exports = {
         "slide-down-fade": "slide-down-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
         "slide-left-fade": "slide-left-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
         // Custom wiggle animation
-        wiggle: "wiggle 0.75s infinite",
+        wiggle: "wiggle 1.5s infinite",
       },
       keyframes: {
         // Tooltip
@@ -49,11 +45,11 @@ module.exports = {
             transform: "translateX(0%)",
             transformOrigin: "50% 50%",
           },
-          "15%": { transform: "translateX(-4px) rotate(-4deg)" },
-          "30%": { transform: "translateX(6px) rotate(4deg)" },
-          "45%": { transform: "translateX(-6px) rotate(-2.4deg)" },
-          "60%": { transform: "translateX(2px) rotate(1.6deg)" },
-          "75%": { transform: "translateX(-1px) rotate(-0.8deg)" },
+          "15%": { transform: "translateX(-6px) rotate(-6deg)" },
+          "30%": { transform: "translateX(9px) rotate(6deg)" },
+          "45%": { transform: "translateX(-9px) rotate(-3.6deg)" },
+          "60%": { transform: "translateX(3px) rotate(2.4deg)" },
+          "75%": { transform: "translateX(-2px) rotate(-1.2deg)" },
         },
       },
     },

@@ -9,7 +9,7 @@ import Meta from "../meta";
 import ProjectSelect from "./project-select";
 import UserDropdown from "./user-dropdown";
 
-const CRISP_SCRIPT = `window.$crisp=[];window.CRISP_WEBSITE_ID="2c09b1ee-14c2-46d1-bf72-1dbb998a19e0";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`;
+//const CRISP_SCRIPT = `window.$crisp=[];window.CRISP_WEBSITE_ID="2c09b1ee-14c2-46d1-bf72-1dbb998a19e0";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`;
 
 const NavTabs = dynamic(() => import("./nav-tabs"), {
   ssr: false,
@@ -32,6 +32,7 @@ export default function AppLayout({
   return (
     <div>
       <Meta />
+      {/* 
       <Script
         id="script-crisp"
         dangerouslySetInnerHTML={{
@@ -39,6 +40,7 @@ export default function AppLayout({
         }}
         strategy="lazyOnload"
       />
+      */}
       <Toaster />
       <div
         className={`min-h-screen w-full ${bgWhite ? "bg-white" : "bg-gray-50"}`}
@@ -48,18 +50,17 @@ export default function AppLayout({
             <div className="flex h-16 items-center justify-between">
               <div className="flex items-center">
                 <Link href="/">
-                  <Logo className="h-8 w-8 transition-all duration-75 active:scale-95" />
+                  <a>
+                    <Logo className="h-8 w-8 transition-all duration-75 active:scale-95" />
+                  </a>
                 </Link>
                 <Divider className="h-8 w-8 text-gray-200 sm:ml-3" />
                 <ProjectSelect />
                 {key && slug && (
                   <>
                     <Divider className="h-8 w-8 text-gray-200 sm:mr-3" />
-                    <Link
-                      href={`/${slug}/${key}`}
-                      className="text-sm font-medium"
-                    >
-                      {key}
+                    <Link href={`/${slug}/${key}`}>
+                      <a className="text-sm font-medium">{key}</a>
                     </Link>
                   </>
                 )}

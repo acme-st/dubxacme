@@ -1,12 +1,7 @@
 import { NextRouter } from "next/router";
 import ms from "ms";
 import { customAlphabet } from "nanoid";
-import {
-  SPECIAL_APEX_DOMAINS,
-  ccTLDs,
-  SECOND_LEVEL_DOMAINS,
-} from "./constants";
-import { createClient } from "@vercel/edge-config";
+import { SPECIAL_APEX_DOMAINS, ccTLDs, secondLevelDomains } from "./constants";
 
 export const nanoid = customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -60,14 +55,9 @@ export function nFormatter(num: number, digits?: number) {
     : "0";
 }
 
-export function capitalize(str: string) {
-  if (!str || typeof str !== "string") return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
 export function linkConstructor({
   key,
-  domain = "dub.sh",
+  domain = "acme.st",
   localhost,
   pretty,
   noDomain,
@@ -78,13 +68,55 @@ export function linkConstructor({
   pretty?: boolean;
   noDomain?: boolean;
 }) {
-  const link = `${localhost ? "http://localhost:3000" : `https://${domain}`}${
-    key !== "_root" ? `/${key}` : ""
-  }`;
+  const link = `${
+    localhost ? "http://localhost:3000" : `https://${domain}`
+  }/${key}`;
 
   if (noDomain) return `/${key}`;
   return pretty ? link.replace(/^https?:\/\//, "") : link;
 }
+
+export const getTitleFromUrl = async (url: string) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2000); // timeout if it takes longer than 2 seconds
+  const title = await fetch(url, { signal: controller.signal })
+    .then((res) => {
+      clearTimeout(timeoutId);
+      return res.text();
+    })
+    .then((body: string) => {
+      let match = body.match(/<title>([^<]*)<\/title>/); // regular expression to parse contents of the <title> tag
+      if (!match || typeof match[1] !== "string") return "No title found"; // if no title found, return "No title found"
+      return match[1];
+    })
+    .catch((err) => {
+      console.log(err);
+      return "No title found"; // if there's an error, return "No title found"
+    });
+  return title;
+};
+
+export const getDescriptionFromUrl = async (url: string) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2000); // timeout if it takes longer than 2 seconds
+  const description = await fetch(url, { signal: controller.signal })
+    .then((res) => {
+      clearTimeout(timeoutId);
+      return res.text();
+    })
+    .then((body: string) => {
+      let match = body.match(/<meta name="description" content="(.*?)"\/>/g); // regular expression to parse contents of the description meta tag
+      if (!match || typeof match[0] !== "string") return "No description found"; // if no title found, return "No title found"
+      let description = match[0].match(/content="(.*)"\/>/).pop();
+      if (!description) return "No description found";
+      return description;
+    })
+    .catch((err) => {
+      console.log(err);
+      return "No description found"; // if there's an error, return "No title found"
+    });
+  return description;
+};
 
 export const timeAgo = (timestamp: Date, timeOnly?: boolean): string => {
   if (!timestamp) return "never";
@@ -101,6 +133,40 @@ export const getDateTimeLocal = (timestamp?: Date): string => {
     .slice(0, 2)
     .join(":");
 };
+
+export const generateSlugFromName = (name: string) => {
+  const normalizedName = name.toLowerCase().replaceAll(" ", "-");
+  if (normalizedName.length < 3) {
+    return "";
+  }
+  if (ccTLDs.has(normalizedName.slice(-2))) {
+    return `${normalizedName.slice(0, -2)}.${normalizedName.slice(-2)}`;
+  }
+  // remove vowels
+  const devowel = normalizedName.replace(/[aeiou]/g, "");
+  if (devowel.length >= 3 && ccTLDs.has(devowel.slice(-2))) {
+    return `${devowel.slice(0, -2)}.${devowel.slice(-2)}`;
+  }
+
+  const acronym = normalizedName
+    .split("-")
+    .map((word) => word[0])
+    .join("");
+
+  if (acronym.length >= 3 && ccTLDs.has(acronym.slice(-2))) {
+    return `${acronym.slice(0, -2)}.${acronym.slice(-2)}`;
+  }
+
+  const shortestString = [normalizedName, devowel, acronym].reduce((a, b) =>
+    a.length < b.length ? a : b,
+  );
+
+  return `${shortestString}.sh`;
+};
+
+export const validDomainRegex = new RegExp(
+  "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$",
+);
 
 export const getFirstAndLastDay = (day: number) => {
   const today = new Date();
@@ -124,34 +190,6 @@ export const getFirstAndLastDay = (day: number) => {
   }
 };
 
-export const generateDomainFromName = (name: string) => {
-  const normalizedName = name
-    .toLowerCase()
-    .trim()
-    .replace(/[\W_]+/g, "");
-  if (normalizedName.length < 3) {
-    return "";
-  }
-  if (ccTLDs.has(normalizedName.slice(-2))) {
-    return `${normalizedName.slice(0, -2)}.${normalizedName.slice(-2)}`;
-  }
-  // remove vowels
-  const devowel = normalizedName.replace(/[aeiou]/g, "");
-  if (devowel.length >= 3 && ccTLDs.has(devowel.slice(-2))) {
-    return `${devowel.slice(0, -2)}.${devowel.slice(-2)}`;
-  }
-
-  const shortestString = [normalizedName, devowel].reduce((a, b) =>
-    a.length < b.length ? a : b,
-  );
-
-  return `${shortestString}.to`;
-};
-
-export const validDomainRegex = new RegExp(
-  "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$",
-);
-
 export const getSubdomain = (name: string, apexName: string) => {
   if (name === apexName) return null;
   return name.slice(0, name.length - apexName.length - 1);
@@ -171,63 +209,16 @@ export const getApexDomain = (url: string) => {
   if (parts.length > 2) {
     // if this is a second-level TLD (e.g. co.uk, .com.ua, .org.tt), we need to return the last 3 parts
     if (
-      SECOND_LEVEL_DOMAINS.has(parts[parts.length - 2]) &&
+      secondLevelDomains.has(parts[parts.length - 2]) &&
       ccTLDs.has(parts[parts.length - 1])
     ) {
       return parts.slice(-3).join(".");
     }
-    // otherwise, it's a subdomain (e.g. dub.vercel.app), so we return the last 2 parts
+    // otherwise, it's a subdomain (e.g. ACMEST.vercel.app), so we return the last 2 parts
     return parts.slice(-2).join(".");
   }
-  // if it's a normal domain (e.g. dub.sh), we return the domain
+  // if it's a normal domain (e.g. acme.st), we return the domain
   return domain;
-};
-
-export const isValidUrl = (url: string) => {
-  try {
-    new URL(url);
-    return true;
-  } catch (e) {
-    return false;
-  }
-};
-
-export const getUrlFromString = (str: string) => {
-  if (isValidUrl(str)) return str;
-  try {
-    if (str.includes(".") && !str.includes(" ")) {
-      return new URL(`https://${str}`).toString();
-    }
-  } catch (e) {
-    return null;
-  }
-};
-
-export const getDomainWithoutWWW = (url: string) => {
-  if (isValidUrl(url)) {
-    return new URL(url).hostname.replace(/^www\./, "");
-  }
-  try {
-    if (url.includes(".") && !url.includes(" ")) {
-      return new URL(`https://${url}`).hostname.replace(/^www\./, "");
-    }
-  } catch (e) {
-    return null;
-  }
-};
-
-export const getQueryString = (router: NextRouter) => {
-  const { slug: omit, ...queryWithoutSlug } = router.query as {
-    slug: string;
-    [key: string]: string;
-  };
-  const queryString = new URLSearchParams(queryWithoutSlug).toString();
-  return `${queryString ? "?" : ""}${queryString}`;
-};
-
-export const truncate = (str: string, length: number) => {
-  if (!str || str.length <= length) return str;
-  return `${str.slice(0, length)}...`;
 };
 
 export const getParamsFromURL = (url: string) => {
@@ -252,99 +243,27 @@ export const constructURLFromUTMParams = (
 ) => {
   if (!url) return "";
   try {
-    const newURL = new URL(url);
+    const params = new URL(url).searchParams;
     for (const [key, value] of Object.entries(utmParams)) {
       if (value === "") {
-        newURL.searchParams.delete(key);
+        params.delete(key);
       } else {
-        newURL.searchParams.set(key, value);
+        params.set(key, value);
       }
     }
-    return newURL.toString();
+    return `${url.split("?")[0]}${
+      params.toString() ? `?${params.toString()}` : ""
+    }`;
   } catch (e) {
     return "";
   }
 };
 
-export const paramsMetadata = [
-  { display: "UTM Source", key: "utm_source", examples: "twitter, facebook" },
-  { display: "UTM Medium", key: "utm_medium", examples: "social, email" },
-  { display: "UTM Campaign", key: "utm_campaign", examples: "summer_sale" },
-  { display: "UTM Term", key: "utm_term", examples: "blue_shoes" },
-  { display: "UTM Content", key: "utm_content", examples: "logolink" },
-];
-
-export const getUrlWithoutUTMParams = (url: string) => {
-  try {
-    const newURL = new URL(url);
-    paramsMetadata.forEach((param) => newURL.searchParams.delete(param.key));
-    return newURL.toString();
-  } catch (e) {
-    return url;
-  }
-};
-
-const logTypeToEnv = {
-  cron: process.env.DUB_SLACK_HOOK_CRON,
-  links: process.env.DUB_SLACK_HOOK_LINKS,
-};
-
-export const log = async (message: string, type: "cron" | "links") => {
-  /* Log a message to the console */
-  const HOOK = logTypeToEnv[type];
-  if (!HOOK) return;
-  try {
-    return await fetch(HOOK, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        blocks: [
-          {
-            type: "section",
-            text: {
-              type: "mrkdwn",
-              text: message,
-            },
-          },
-        ],
-      }),
-    });
-  } catch (e) {
-    console.log(`Failed to log to Dub Slack. Error: ${e}`);
-  }
-};
-
-export const edgeConfig = createClient(
-  `https://edge-config.vercel.com/ecfg_eh6zdvznm70adch6q0mqxshrt4ny?token=64aef40c-ea06-4aeb-b528-b94d924ec05a`,
-);
-
-export const getBlackListedDomains = async () => {
-  try {
-    const domains = await edgeConfig.get("domains");
-    return domains || [];
-  } catch (e) {
-    return [];
-  }
-};
-
-export const isBlacklistedDomain = async (domain: string) => {
-  const blacklistedDomains = await getBlackListedDomains();
-  return new RegExp(blacklistedDomains.join("|")).test(
-    getDomainWithoutWWW(domain),
-  );
-};
-
-export const getBlackListedEmails = async () => {
-  try {
-    const emails = await edgeConfig.get("emails");
-    if (emails) {
-      return new Set(emails);
-    } else {
-      return new Set();
-    }
-  } catch (e) {
-    return new Set();
-  }
+export const getQueryString = (router: NextRouter) => {
+  const { slug: omit, ...queryWithoutSlug } = router.query as {
+    slug: string;
+    [key: string]: string;
+  };
+  const queryString = new URLSearchParams(queryWithoutSlug).toString();
+  return `${queryString ? "?" : ""}${queryString}`;
 };

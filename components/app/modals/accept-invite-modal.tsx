@@ -47,7 +47,7 @@ function AcceptInviteModal({
               <span className="font-mono text-purple-600">
                 {slug || "......"}
               </span>{" "}
-              project on Dub
+              project on Acme.st
             </p>
           </div>
           <div className="flex flex-col space-y-6 bg-gray-50 px-4 py-8 text-left sm:px-16">
@@ -59,7 +59,6 @@ function AcceptInviteModal({
                   headers: { "Content-Type": "application/json" },
                 }).then(() => {
                   toast.success("You now are a part of this project!");
-                  mutate(`/api/projects`);
                   mutate(`/api/projects/${slug}`);
                   mutate(`/api/projects/${slug}/users`);
                 });
@@ -95,11 +94,10 @@ function AcceptInviteModal({
             </p>
           </div>
           <div className="flex flex-col space-y-6 bg-gray-50 px-4 py-8 text-left sm:px-16">
-            <Link
-              href="/"
-              className="flex h-10 w-full items-center justify-center rounded-md border border-black bg-black text-sm text-white transition-all hover:bg-white hover:text-black focus:outline-none"
-            >
-              Back to dashboard
+            <Link href="/">
+              <a className="flex h-10 w-full items-center justify-center rounded-md border border-black bg-black text-sm text-white transition-all hover:bg-white hover:text-black focus:outline-none">
+                Back to dashboard
+              </a>
             </Link>
           </div>
         </div>

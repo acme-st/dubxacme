@@ -441,11 +441,7 @@ function waitUntilImageLoaded(img: HTMLImageElement, src: string) {
   });
 }
 
-export async function getQRAsCanvas(
-  props: QRProps,
-  type: string,
-  getCanvas?: boolean,
-): Promise<HTMLCanvasElement | string> {
+export async function getQRAsCanvas(props: QRProps, type: string) {
   const {
     value,
     size = DEFAULT_SIZE,
@@ -473,7 +469,6 @@ export async function getQRAsCanvas(
   );
 
   const image = new Image();
-  image.crossOrigin = "anonymous";
   if (calculatedImageSettings) {
     await waitUntilImageLoaded(image, imageSettings.src);
     if (calculatedImageSettings.excavation != null) {
@@ -519,8 +514,6 @@ export async function getQRAsCanvas(
       calculatedImageSettings.h,
     );
   }
-
-  if (getCanvas) return canvas;
 
   const url = canvas.toDataURL(type, 1.0);
   canvas.remove();

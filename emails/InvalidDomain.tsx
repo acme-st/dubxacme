@@ -44,8 +44,8 @@ export default function InvalidDomain({
                     {domain}
                   </a>
                 </code>{" "}
-                for your Dub project{" "}
-                <a href={`https://app.dub.sh/${projectSlug}`} target="_blank">
+                for your ACMEST project{" "}
+                <a href={`https://app.acme.st/${projectSlug}`} target="_blank">
                   {projectSlug}↗
                 </a>{" "}
                 has been invalid for {invalidDays} days.
@@ -56,13 +56,13 @@ export default function InvalidDomain({
                 configure your domain.
               </MjmlText>
               <ButtonPrimary
-                link={`https://app.dub.sh/${projectSlug}/settings`}
+                link={`https://app.acme.st/${projectSlug}/settings`}
                 uiText="Configure my domain"
               />
               <MjmlText cssClass="paragraph">
-                If you do not want to keep this project on Dub, you can{" "}
+                If you do not want to keep this project on ACMEST, you can{" "}
                 <a
-                  href={`https://app.dub.sh/${projectSlug}/settings`}
+                  href={`https://app.acme.st/${projectSlug}/settings`}
                   target="_blank"
                 >
                   delete it
@@ -75,7 +75,7 @@ export default function InvalidDomain({
                   : "this will be the last time I'll email you about this."}
               </MjmlText>
               <MjmlText cssClass="paragraph" color={grayDark}>
-                Steven from Dub
+              Acme.st - ACME ShorTner
               </MjmlText>
               <Divider />
             </MjmlColumn>

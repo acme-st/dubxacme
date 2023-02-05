@@ -1,4 +1,6 @@
 import type { NextRequest } from "next/server";
+import { RawStatsProps } from "@/lib/stats";
+import { redis } from "@/lib/upstash";
 
 export const config = {
   runtime: "experimental-edge",
@@ -6,31 +8,22 @@ export const config = {
 
 export default async function handler(req: NextRequest) {
   if (req.method === "GET") {
-    const count = 50;
-
-    const response = await fetch(
-      `https://api.us-east.tinybird.co/v0/pipes/coordinates.json`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.TINYBIRD_API_KEY}`,
-        },
-      },
-    )
-      .then((res) => res.json())
-      .then((res) => res.data);
-
-    const latestCoordinates = response.map(({ latitude, longitude }, idx) => {
+    const numPoints = 50;
+    const domain = req.nextUrl.searchParams.get("domain");
+    const rawData = await redis.zrange<RawStatsProps[]>(
+      domain ? `${domain}:root:clicks` : "acme.st:clicks:biblic",
+      0,
+      numPoints,
+      { rev: true },
+    );
+    const latestCoordinates = rawData.map((data, idx) => {
+      const { latitude, longitude } = data.geo;
       return {
         location: [latitude, longitude],
-        size: 0.075 - (0.075 / count) * idx,
+        size: 0.075 - (0.075 / numPoints) * idx,
       };
     });
-    return new Response(JSON.stringify(latestCoordinates), {
-      status: 200,
-      headers: {
-        "Cache-Control": "s-maxage=86400",
-      },
-    });
+    return new Response(JSON.stringify(latestCoordinates), { status: 200 });
   } else {
     return new Response(`Method ${req.method} Not Allowed`, { status: 405 });
   }

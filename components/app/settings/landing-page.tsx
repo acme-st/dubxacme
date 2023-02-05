@@ -7,7 +7,6 @@ import Tooltip, { TooltipContent } from "@/components/shared/tooltip";
 import useProject from "@/lib/swr/use-project";
 import useUsage from "@/lib/swr/use-usage";
 import { fetcher, nFormatter } from "@/lib/utils";
-import Link from "next/link";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -22,7 +21,7 @@ export default function LandingPage() {
     fetcher,
   );
 
-  const { data: clicks } = useSWR<string>(
+  const { data: clicks, isValidating } = useSWR<string>(
     slug && domain && `/api/projects/${slug}/domains/${domain}/root/clicks`,
     fetcher,
   );
@@ -67,24 +66,21 @@ export default function LandingPage() {
             </a>
           </p>
           {domainVerified && (
-            <Link
-              href={`/${slug}/_root`}
-              className="flex items-center space-x-1 rounded-md bg-gray-100 px-2 py-0.5 transition-all duration-75 hover:scale-105 active:scale-95"
-            >
+            <div className="absolute top-5 right-5 flex cursor-default items-center space-x-1 rounded-md bg-gray-100 px-2 py-0.5 sm:relative sm:inset-auto">
               <Chart className="h-4 w-4" />
               <p className="text-sm text-gray-500">
-                {!clicks ? (
+                {isValidating || !clicks ? (
                   <LoadingDots color="#71717A" />
                 ) : (
                   nFormatter(parseInt(clicks))
                 )}{" "}
                 clicks
               </p>
-            </Link>
+            </div>
           )}
         </div>
         <div />
-        {plan !== "Free" ? (
+        {domainVerified && plan !== "Free" ? (
           <input
             type="url"
             name="root"
@@ -97,15 +93,19 @@ export default function LandingPage() {
         ) : (
           <Tooltip
             content={
-              <TooltipContent
-                title={`You can't configure a custom landing page on a free plan. ${
-                  isOwner
-                    ? "Upgrade to a Pro plan to proceed."
-                    : "Ask your project owner to upgrade to a Pro plan."
-                }`}
-                cta={isOwner && "Upgrade to Pro"}
-                ctaLink={isOwner && "/settings"}
-              />
+              !domainVerified ? (
+                "You need to verify your domain first."
+              ) : (
+                <TooltipContent
+                  title={`You can't configure a custom landing page on a free plan. ${
+                    isOwner
+                      ? "Upgrade to a Pro plan to proceed."
+                      : "Ask your project owner to upgrade to a Pro plan."
+                  }`}
+                  cta={isOwner && "Upgrade to Pro"}
+                  ctaLink={isOwner && "/settings"}
+                />
+              )
             }
           >
             <div className="w-full max-w-md cursor-not-allowed rounded-md border border-gray-300 px-3 py-2 text-left text-sm text-gray-300">
@@ -118,7 +118,7 @@ export default function LandingPage() {
       <div className="border-b border-gray-200" />
 
       <div className="px-5 py-4 sm:flex sm:items-center sm:justify-end sm:px-10">
-        {plan !== "Free" ? (
+        {domainVerified && plan !== "Free" ? (
           <button
             disabled={saving}
             className={`${
@@ -132,15 +132,19 @@ export default function LandingPage() {
         ) : (
           <Tooltip
             content={
-              <TooltipContent
-                title={`You can't configure a custom landing page on a free plan. ${
-                  isOwner
-                    ? "Upgrade to a Pro plan to proceed."
-                    : "Ask your project owner to upgrade to a Pro plan."
-                }`}
-                cta={isOwner && "Upgrade to Pro"}
-                ctaLink={isOwner && "/settings"}
-              />
+              !domainVerified ? (
+                "You need to verify your domain first."
+              ) : (
+                <TooltipContent
+                  title={`You can't configure a custom landing page on a free plan. ${
+                    isOwner
+                      ? "Upgrade to a Pro plan to proceed."
+                      : "Ask your project owner to upgrade to a Pro plan."
+                  }`}
+                  cta={isOwner && "Upgrade to Pro"}
+                  ctaLink={isOwner && "/settings"}
+                />
+              )
             }
             fullWidth
           >

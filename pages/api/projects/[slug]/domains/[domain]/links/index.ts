@@ -2,14 +2,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { addLink, getLinksForProject } from "@/lib/api/links";
 import { withProjectAuth } from "@/lib/auth";
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "1500kb",
-    },
-  },
-};
-
 export default withProjectAuth(
   async (req: NextApiRequest, res: NextApiResponse, _, session) => {
     // GET /api/projects/[slug]/domains/[domain]/links - Get all links for a project
@@ -35,10 +27,6 @@ export default withProjectAuth(
       if (!domain || !key || !url) {
         return res.status(400).json({ error: "Missing domain or url or key" });
       }
-      const { hostname, pathname } = new URL(url);
-      if (hostname === domain && pathname === `/${key}`) {
-        return res.status(400).json({ error: "Invalid url" });
-      }
       const response = await addLink({
         ...req.body,
         userId: session.user.id,
@@ -56,6 +44,7 @@ export default withProjectAuth(
   },
   {
     excludeGet: true,
+    needVerifiedDomain: true,
     needNotExceededUsage: true,
   },
 );

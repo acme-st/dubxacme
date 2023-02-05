@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { withProjectAuth } from "@/lib/auth";
 import { redis } from "@/lib/upstash";
-import { RootDomainProps } from "@/lib/types";
 
 export default withProjectAuth(
   async (req: NextApiRequest, res: NextApiResponse) => {
@@ -9,17 +8,13 @@ export default withProjectAuth(
 
     // GET /api/projects/[slug]/domains/[domain]/root - get root domain
     if (req.method === "GET") {
-      const { target } =
-        (await redis.get<RootDomainProps>(`root:${domain}`)) || {};
-      return res.status(200).json(target);
+      const rootDomain = await redis.get<string>(`root:${domain}`);
+      return res.status(200).json(rootDomain);
 
       // PUT /api/projects/[slug]/domains/[domain]/root - change root domain
     } else if (req.method === "PUT") {
       const { rootDomain } = req.body as { rootDomain: string };
-      const response = await redis.set(`root:${domain}`, {
-        target: rootDomain,
-        rewrite: false,
-      });
+      const response = await redis.set(`root:${domain}`, rootDomain);
       res.status(200).json(response);
     } else {
       res.setHeader("Allow", ["GET", "PUT"]);
@@ -30,7 +25,9 @@ export default withProjectAuth(
   },
   {
     excludeGet: true,
+    needVerifiedDomain: true,
     needNotExceededUsage: true,
-    needProSubscription: true,
+    // TODO: For when we make this a pro feature
+    // needProSubscription: true,
   },
 );

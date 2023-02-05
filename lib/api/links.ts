@@ -3,7 +3,7 @@ import { DEFAULT_REDIRECTS, RESERVED_KEYS } from "@/lib/constants";
 import prisma from "@/lib/prisma";
 import { LinkProps } from "@/lib/types";
 import { redis } from "@/lib/upstash";
-import { getParamsFromURL, nanoid, truncate } from "@/lib/utils";
+import { getParamsFromURL, nanoid } from "@/lib/utils";
 
 const getFiltersFromStatus = (status: string) => {
   if (status === "all" || status === "none") {
@@ -109,10 +109,10 @@ export async function getRandomKey(domain: string): Promise<string> {
 
 export async function checkIfKeyExists(domain: string, key: string) {
   if (
-    domain === "dub.sh" &&
+    domain === "acme.st" &&
     (RESERVED_KEYS.has(key) || DEFAULT_REDIRECTS[key])
   ) {
-    return true; // reserved keys for dub.sh
+    return true; // reserved keys for acme.st
   }
   const link = await prisma.link.findUnique({
     where: {
@@ -126,22 +126,11 @@ export async function checkIfKeyExists(domain: string, key: string) {
 }
 
 export async function addLink(link: LinkProps) {
-  const {
-    domain,
-    key,
-    url,
-    expiresAt,
-    password,
-    title,
-    description,
-    image,
-    proxy,
-    ios,
-    android,
-  } = link;
+  const { domain, key, url, expiresAt, password, title, description, image } =
+    link;
   const hasPassword = password && password.length > 0 ? true : false;
+  const proxy = title && description && image ? true : false;
   const exat = expiresAt ? new Date(expiresAt).getTime() / 1000 : null;
-  const uploadedImage = image && image.startsWith("data:image") ? true : false;
 
   const exists = await checkIfKeyExists(domain, key);
   if (exists) return null;
@@ -153,9 +142,8 @@ export async function addLink(link: LinkProps) {
     prisma.link.create({
       data: {
         ...link,
-        title: truncate(title, 120),
-        description: truncate(description, 240),
-        image: uploadedImage ? undefined : image,
+        // can't upload base64 image string to mysql, need to upload to cloudinary first
+        image: undefined,
         utm_source,
         utm_medium,
         utm_campaign,
@@ -169,8 +157,6 @@ export async function addLink(link: LinkProps) {
         url,
         password: hasPassword,
         proxy,
-        ios,
-        android,
       },
       {
         nx: true,
@@ -179,7 +165,7 @@ export async function addLink(link: LinkProps) {
       },
     ),
   ]);
-  if (proxy && image) {
+  if (image) {
     const { secure_url } = await cloudinary.v2.uploader.upload(image, {
       public_id: key,
       folder: domain,
@@ -198,7 +184,11 @@ export async function addLink(link: LinkProps) {
   return response;
 }
 
-export async function editLink(link: LinkProps, oldKey: string) {
+export async function editLink(
+  link: LinkProps,
+  oldKey: string,
+  projectSlug: string,
+) {
   const {
     id,
     domain,
@@ -209,14 +199,12 @@ export async function editLink(link: LinkProps, oldKey: string) {
     title,
     description,
     image,
-    proxy,
-    ios,
-    android,
   } = link;
   const hasPassword = password && password.length > 0 ? true : false;
+  const proxy = title && description && image ? true : false;
   const exat = expiresAt ? new Date(expiresAt).getTime() : null;
   const changedKey = key !== oldKey;
-  const uploadedImage = image && image.startsWith("data:image") ? true : false;
+  const uploadedImage = image && image.startsWith("data:image");
 
   if (changedKey) {
     const exists = await checkIfKeyExists(domain, key);
@@ -232,8 +220,7 @@ export async function editLink(link: LinkProps, oldKey: string) {
       },
       data: {
         ...link,
-        title: truncate(title, 120),
-        description: truncate(description, 240),
+        // if it's an uploaded image (base64 URI), need to upload to cloudinary first
         image: uploadedImage ? undefined : image,
         utm_source,
         utm_medium,
@@ -242,25 +229,20 @@ export async function editLink(link: LinkProps, oldKey: string) {
         utm_content,
       },
     }),
-    // only upload image to cloudinary if proxy is true and there's an image
-    proxy && image
-      ? cloudinary.v2.uploader.upload(image, {
-          public_id: key,
-          folder: domain,
-          overwrite: true,
-          invalidate: true,
-        })
-      : cloudinary.v2.uploader.destroy(`${domain}/${key}`, {
-          invalidate: true,
-        }),
+    // only upload image to cloudinary if it's changed
+    uploadedImage &&
+      cloudinary.v2.uploader.upload(image, {
+        public_id: key,
+        folder: domain,
+        overwrite: true,
+        invalidate: true,
+      }),
     redis.set(
       `${domain}:${key}`,
       {
         url,
         password: hasPassword,
         proxy,
-        ios,
-        android,
       },
       {
         // if the key has an expiry, set exat
@@ -271,15 +253,24 @@ export async function editLink(link: LinkProps, oldKey: string) {
     ...(changedKey
       ? [
           cloudinary.v2.uploader
-            .destroy(`${domain}/${oldKey}`, {
+            .rename(`${domain}/${oldKey}`, `${domain}/${key}`, {
               invalidate: true,
             })
             .catch(() => {}),
           redis.del(`${domain}:${oldKey}`),
+          redis
+            .rename(`${domain}:clicks:${oldKey}`, `${domain}:clicks:${key}`)
+            .catch(() => {}),
         ]
       : []),
+    // if this link has custom OG tags and the key is the same, update the proxy cache
+    proxy &&
+      !changedKey &&
+      (await fetch(
+        `https://acme.st/api/projects/${projectSlug}/domains/${domain}/links/${oldKey}/revalidate?secret=${process.env.REVALIDATE_TOKEN}`,
+      )),
   ]);
-  if (proxy && image) {
+  if (uploadedImage) {
     const { secure_url } = effects[0];
     response.image = secure_url;
     await prisma.link.update({
@@ -309,14 +300,11 @@ export async function deleteLink(domain: string, key: string) {
       invalidate: true,
     }),
     redis.del(`${domain}:${key}`),
+    redis.del(`${domain}:clicks:${key}`),
   ]);
 }
 
-export async function archiveLink(
-  domain: string,
-  key: string,
-  archived = true,
-) {
+export async function archiveLink(domain: string, key: string) {
   return await prisma.link.update({
     where: {
       domain_key: {
@@ -325,81 +313,7 @@ export async function archiveLink(
       },
     },
     data: {
-      archived,
+      archived: true,
     },
   });
-}
-
-/* Change the domain for every link and its respective stats when the project domain is changed */
-export async function changeDomainForLinks(
-  projectId: string,
-  domain: string,
-  newDomain: string,
-) {
-  const links = await prisma.link.findMany({
-    where: {
-      project: {
-        id: projectId,
-      },
-    },
-  });
-  const pipeline = redis.pipeline();
-  links.forEach(({ key }) => {
-    pipeline.rename(`${domain}:${key}`, `${newDomain}:${key}`);
-  });
-  try {
-    return await pipeline.exec();
-  } catch (e) {
-    return null;
-  }
-}
-
-/* Change the domain for all images for a given project on Cloudinary */
-export async function changeDomainForImages(
-  projectId: string,
-  domain: string,
-  newDomain: string,
-) {
-  const links = await prisma.link.findMany({
-    where: {
-      project: {
-        id: projectId,
-      },
-    },
-  });
-  try {
-    return await Promise.all(
-      links.map(({ key }) =>
-        cloudinary.v2.uploader.rename(
-          `${domain}/${key}`,
-          `${newDomain}/${key}`,
-          {
-            invalidate: true,
-          },
-        ),
-      ),
-    );
-  } catch (e) {
-    return null;
-  }
-}
-
-/* Delete all links & stats associated with a project when it's deleted */
-export async function deleteProjectLinks(domain: string) {
-  const links = await prisma.link.findMany({
-    where: {
-      project: {
-        domain,
-      },
-    },
-  });
-  const pipeline = redis.pipeline();
-  links.forEach(({ key }) => {
-    pipeline.del(`${domain}:${key}`);
-  });
-  try {
-    return await pipeline.exec();
-  } catch (e) {
-    return null;
-  }
 }

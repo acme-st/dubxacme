@@ -15,9 +15,11 @@ export default function NoLinksPlaceholder({
         alt="No links yet"
         width={400}
         height={400}
-        className="pointer-events-none -my-8"
+        className="-my-8"
       />
-      <AddEditLinkButton />
+      <div className="z-10">
+        <AddEditLinkButton />
+      </div>
     </div>
   );
 }

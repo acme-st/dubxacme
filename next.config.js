@@ -4,11 +4,10 @@ module.exports = {
   images: {
     domains: [
       "www.google.com",
-      "avatar.vercel.sh",
+      "avatar.tobi.sh",
       "faisalman.github.io",
       "avatars.dicebear.com",
       "res.cloudinary.com",
-      "pbs.twimg.com",
     ],
   },
   async headers() {

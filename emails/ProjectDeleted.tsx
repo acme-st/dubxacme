@@ -42,27 +42,27 @@ export default function ProjectDeleted({
                     {domain}
                   </a>
                 </code>{" "}
-                for your Dub project{" "}
-                <a href={`https://app.dub.sh/${projectSlug}`} target="_blank">
+                for your ACMEST project{" "}
+                <a href={`https://app.acme.st/${projectSlug}`} target="_blank">
                   {projectSlug}↗
                 </a>{" "}
                 has been invalid for 30 days. As a result, your project has been
-                deleted from Dub.
+                deleted from ACMEST.
               </MjmlText>
               <MjmlText cssClass="paragraph">
                 If you would like to restore the project, you can easily create
-                it again on Dub with the link below.
+                it again on ACMEST with the link below.
               </MjmlText>
               <ButtonPrimary
-                link={`https://app.dub.sh/`}
+                link={`https://app.acme.st/`}
                 uiText="Create a new project"
               />
               <MjmlText cssClass="paragraph">
-                If you did not want to keep this project on Dub anyway, you can
+                If you did not want to keep this project on ACMEST anyway, you can
                 simply ignore this email.
               </MjmlText>
               <MjmlText cssClass="paragraph" color={grayDark}>
-                Steven from Dub
+              Acme.st - ACME ShorTner
               </MjmlText>
               <Divider />
             </MjmlColumn>

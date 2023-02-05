@@ -40,7 +40,6 @@ export default function Tooltip({
   return (
     <>
       <button
-        type="button"
         className={`${fullWidth ? "w-full" : "inline-flex"} sm:hidden`}
         onClick={() => setOpenTooltip(true)}
       >
@@ -101,7 +100,7 @@ export default function Tooltip({
           <TooltipPrimitive.Content
             sideOffset={4}
             side="top"
-            className="z-30 hidden animate-slide-up-fade items-center overflow-hidden rounded-md border border-gray-200 bg-white drop-shadow-lg sm:block"
+            className="z-20 hidden animate-slide-up-fade items-center overflow-hidden rounded-md border border-gray-200 bg-white drop-shadow-lg sm:block"
           >
             <TooltipPrimitive.Arrow className="fill-current text-white" />
             {typeof content === "string" ? (
@@ -134,11 +133,10 @@ export function TooltipContent({
     <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
       <p className="text-sm text-gray-700">{title}</p>
       {cta && ctaLink && (
-        <Link
-          href={ctaLink}
-          className="mt-4 rounded-full border border-black bg-black py-1.5 px-3 text-sm text-white transition-all hover:bg-white hover:text-black"
-        >
-          {cta}
+        <Link href={ctaLink}>
+          <a className="mt-4 rounded-full border border-black bg-black py-1.5 px-3 text-sm text-white transition-all hover:bg-white hover:text-black">
+            {cta}
+          </a>
         </Link>
       )}
     </div>

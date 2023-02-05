@@ -19,14 +19,14 @@ export default function WelcomeEmail({ name }: { name?: string }): JSX.Element {
       <Head />
       <MjmlBody width={500}>
         <MjmlWrapper cssClass="container">
-          <Header title="Welcome to Dub" />
+          <Header title="Welcome to ACMEST" />
           <MjmlSection padding="0">
             <MjmlColumn>
               <MjmlImage
                 cssClass="hero"
                 padding="0"
                 align="left"
-                src="https://dub.sh/_static/thumbnail.png"
+                src="https://acme.st/_static/thumbnail.png"
               />
             </MjmlColumn>
           </MjmlSection>
@@ -36,34 +36,33 @@ export default function WelcomeEmail({ name }: { name?: string }): JSX.Element {
                 Thanks for signing up{name && `, ${name}`}!
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                My name is Steven, and I'm the creator of Dub - the open-source
-                Bitly alternative. I'm excited to have you on board!
+              Acme.st - ACME ShorTner. I'm excited to have you on board!
               </MjmlText>
               <MjmlText cssClass="paragraph">
                 Here are a few things you can do:
               </MjmlText>
               <MjmlText cssClass="li">
                 •&nbsp;&nbsp;Create a custom{" "}
-                <a href="https://app.dub.sh/links" target="_blank">
-                  Dub.sh short link
+                <a href="https://app.acme.st/links" target="_blank">
+                  acme.st short link
                 </a>
               </MjmlText>
               <MjmlText cssClass="li">
                 •&nbsp;&nbsp;Create a new{" "}
-                <a href="https://app.dub.sh/" target="_blank">
+                <a href="https://app.acme.st/" target="_blank">
                   project
                 </a>{" "}
                 and add your custom domain
               </MjmlText>
               <MjmlText cssClass="li">
                 •&nbsp;&nbsp;Star the repo on{" "}
-                <a href="https://github.com/steven-tey/dub" target="_blank">
+                <a href="https://github.com/" target="_blank">
                   GitHub
                 </a>
               </MjmlText>
               <MjmlText cssClass="li">
                 •&nbsp;&nbsp;Follow us on{" "}
-                <a href="https://twitter.com/dubdotsh/" target="_blank">
+                <a href="https://twitter.com/" target="_blank">
                   Twitter
                 </a>
               </MjmlText>
@@ -72,7 +71,10 @@ export default function WelcomeEmail({ name }: { name?: string }): JSX.Element {
                 happy to help!
               </MjmlText>
               <MjmlText cssClass="paragraph" color={grayDark}>
-                Steven from Dub
+               Thanks,
+              </MjmlText>
+              <MjmlText cssClass="paragraph" color={grayDark}>
+              Acme.st - ACME ShorTner
               </MjmlText>
               <Divider />
             </MjmlColumn>

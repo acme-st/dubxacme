@@ -13,16 +13,14 @@ import { useDebounce } from "use-debounce";
 import BlurImage from "@/components/shared/blur-image";
 import { AlertCircleFill, LoadingDots } from "@/components/shared/icons";
 import Modal from "@/components/shared/modal";
-import { generateDomainFromName } from "@/lib/utils";
+import { generateSlugFromName } from "@/lib/utils";
 
 function AddProjectModalHelper({
   showAddProjectModal,
   setShowAddProjectModal,
-  closeWithX,
 }: {
   showAddProjectModal: boolean;
   setShowAddProjectModal: Dispatch<SetStateAction<boolean>>;
-  closeWithX?: boolean;
 }) {
   const router = useRouter();
 
@@ -43,22 +41,20 @@ function AddProjectModalHelper({
 
   const [debouncedSlug] = useDebounce(slug, 500);
   useEffect(() => {
-    if (debouncedSlug.length > 0) {
+    if (debouncedSlug.length > 0 && !slugError) {
       fetch(`/api/projects/${slug}/exists`).then(async (res) => {
         if (res.status === 200) {
           const exists = await res.json();
           setSlugError(exists === 1 ? "Slug is already in use." : null);
         }
       });
-    } else {
-      setSlugError(null);
     }
   }, [debouncedSlug, slugError]);
 
   const [debouncedDomain] = useDebounce(domain, 500);
   useEffect(() => {
-    if (debouncedDomain.length > 0) {
-      fetch(`/api/projects/dub.sh/domains/${debouncedDomain}/exists`).then(
+    if (debouncedDomain.length > 0 && !domainError) {
+      fetch(`/api/projects/acme.st/domains/${debouncedDomain}/exists`).then(
         async (res) => {
           if (res.status === 200) {
             const exists = await res.json();
@@ -66,19 +62,14 @@ function AddProjectModalHelper({
           }
         },
       );
-    } else {
-      setDomainError(null);
     }
   }, [debouncedDomain, domainError]);
 
   useEffect(() => {
     setData((prev) => ({
       ...prev,
-      slug: name
-        .toLowerCase()
-        .trim()
-        .replace(/[\W_]+/g, "-"),
-      domain: generateDomainFromName(name),
+      slug: name.toLowerCase().replaceAll(" ", "-"),
+      domain: generateSlugFromName(name),
     }));
   }, [name]);
 
@@ -86,13 +77,12 @@ function AddProjectModalHelper({
     <Modal
       showModal={showAddProjectModal}
       setShowModal={setShowAddProjectModal}
-      closeWithX={closeWithX}
     >
       <div className="inline-block w-full transform overflow-hidden bg-white align-middle shadow-xl transition-all sm:max-w-md sm:rounded-2xl sm:border sm:border-gray-200">
         <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 px-4 py-4 pt-8 sm:px-16">
           <BlurImage
             src={`/_static/logo.png`}
-            alt={"dub.sh"}
+            alt={"acme.st"}
             className="h-10 w-10 rounded-full border border-gray-200"
             width={20}
             height={20}
@@ -147,7 +137,7 @@ function AddProjectModalHelper({
                 type="text"
                 required
                 className="block w-full rounded-md border-gray-300 text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
-                placeholder="Dub"
+                placeholder="ACMEST"
                 value={name}
                 onChange={(e) => {
                   setData({ ...data, name: e.target.value });
@@ -166,7 +156,7 @@ function AddProjectModalHelper({
             </label>
             <div className="relative mt-1 flex rounded-md shadow-sm">
               <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-5 text-gray-500 sm:text-sm">
-                app.dub.sh
+                app.acme.st
               </span>
               <input
                 name="slug"
@@ -179,7 +169,7 @@ function AddProjectModalHelper({
                     ? "border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500"
                     : "border-gray-300 text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:ring-gray-500"
                 } block w-full rounded-r-md pr-10 focus:outline-none sm:text-sm`}
-                placeholder="dub"
+                placeholder="ACMEST"
                 value={slug}
                 onChange={(e) => {
                   setSlugError(null);
@@ -208,7 +198,7 @@ function AddProjectModalHelper({
               htmlFor="domain"
               className="block text-sm font-medium text-gray-700"
             >
-              Shortlink Domain
+              Domain
             </label>
             <div className="relative mt-1 flex rounded-md shadow-sm">
               <input
@@ -222,7 +212,7 @@ function AddProjectModalHelper({
                     ? "border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500"
                     : "border-gray-300 text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:ring-gray-500"
                 } block w-full rounded-md pr-10 focus:outline-none sm:text-sm`}
-                placeholder="dub.sh"
+                placeholder="acme.st"
                 value={domain}
                 onChange={(e) => {
                   setDomainError(null);
@@ -245,7 +235,7 @@ function AddProjectModalHelper({
                   Domain is already in use.{" "}
                   <a
                     className="underline"
-                    href="mailto:steven@dub.sh?subject=My Domain Is Already In Use"
+                    href="mailto:acmest@biblic.net?subject=My Domain Is Already In Use"
                   >
                     Contact us
                   </a>{" "}
@@ -274,7 +264,7 @@ function AddProjectModalHelper({
   );
 }
 
-export function useAddProjectModal({ closeWithX }: { closeWithX?: boolean }) {
+export function useAddProjectModal({ domain }: { domain?: string }) {
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
 
   const AddProjectModal = useCallback(() => {
@@ -282,10 +272,9 @@ export function useAddProjectModal({ closeWithX }: { closeWithX?: boolean }) {
       <AddProjectModalHelper
         showAddProjectModal={showAddProjectModal}
         setShowAddProjectModal={setShowAddProjectModal}
-        closeWithX={closeWithX}
       />
     );
-  }, [showAddProjectModal, setShowAddProjectModal, closeWithX]);
+  }, [showAddProjectModal, setShowAddProjectModal, domain]);
 
   return useMemo(
     () => ({ setShowAddProjectModal, AddProjectModal }),

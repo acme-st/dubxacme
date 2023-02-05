@@ -1,28 +1,19 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { addLink, getLinksForProject } from "@/lib/api/links";
 import { Session, withUserAuth } from "@/lib/auth";
-import { isBlacklistedDomain } from "@/lib/utils";
-import { log } from "@/lib/utils";
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "1500kb",
-    },
-  },
-};
+// This is a special route for retrieving and creating custom acme.st links.
 
-// This is a special route for retrieving and creating custom dub.sh links.
 export default withUserAuth(
   async (req: NextApiRequest, res: NextApiResponse, session: Session) => {
-    // GET /api/links – get all dub.sh links created by the user
+    // GET /api/links – get all acme.st links created by the user
     if (req.method === "GET") {
       const { status, sort } = req.query as {
         status?: string;
         sort?: "createdAt" | "clicks";
       };
       const response = await getLinksForProject({
-        domain: "dub.sh",
+        domain: "acme.st",
         status,
         sort,
         userId: session.user.id,
@@ -35,24 +26,15 @@ export default withUserAuth(
       if (!key || !url) {
         return res.status(400).json({ error: "Missing key or url" });
       }
-      const { hostname, pathname } = new URL(url);
-      if (hostname === "dub.sh" && pathname === `/${key}`) {
-        return res.status(400).json({ error: "Invalid url" });
-      }
-      const domainBlacklisted = await isBlacklistedDomain(url);
-      if (domainBlacklisted) {
-        return res.status(400).json({ error: "Invalid url" });
-      }
       const response = await addLink({
         ...req.body,
-        domain: "dub.sh",
+        domain: "acme.st",
         userId: session.user.id,
       });
 
       if (response === null) {
-        return res.status(403).json({ error: "Key already exists" });
+        return res.status(400).json({ error: "Key already exists" });
       }
-      await log(`${session.user.email} created a new link for ${url}`, "links");
       return res.status(200).json(response);
     } else {
       res.setHeader("Allow", ["GET", "POST"]);

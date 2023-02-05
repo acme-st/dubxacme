@@ -3,7 +3,7 @@ export default function Logout({ className }: { className: string }) {
     <svg
       fill="none"
       height="24"
-      shapeRendering="geometricPrecision"
+      shape-rendering="geometricPrecision"
       stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"

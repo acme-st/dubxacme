@@ -4,7 +4,6 @@ import { signIn } from "next-auth/react";
 import Meta from "@/components/layout/meta";
 import BlurImage from "@/components/shared/blur-image";
 import { LoadingDots } from "@/components/shared/icons";
-import Background from "@/components/shared/background";
 
 export default function Login() {
   const [signInClicked, setSignInClicked] = useState(false);
@@ -14,13 +13,12 @@ export default function Login() {
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-gray-50">
-      <Meta title="Sign up for Dub" />
-      <Background />
-      <div className="z-10 w-full max-w-md overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
+      <Meta />
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
         <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 bg-white px-4 py-6 pt-8 text-center sm:px-16">
           <BlurImage
             src="/_static/logo.png"
-            alt="Dub.sh logo"
+            alt="acme.st logo"
             className="h-10 w-10 rounded-full"
             width={20}
             height={20}
@@ -44,11 +42,9 @@ export default function Login() {
                 signIn("email", {
                   email,
                   redirect: false,
-                  callbackUrl: "/welcome",
                 }).then((res) => {
                   setSignInClicked(false);
                   if (res?.ok && !res?.error) {
-                    setEmail("");
                     setButtonText("Email sent - check your inbox!");
                   } else {
                     setButtonText("Error sending email - try again?");
@@ -70,10 +66,9 @@ export default function Login() {
               id="email"
               name="email"
               type="email"
-              placeholder="panic@thedis.co"
+              placeholder="acmest@biblic.net"
               autoComplete="email"
               required
-              value={email}
               onChange={(e) => {
                 setAccountExists(false);
                 setEmail(e.target.value);
@@ -98,16 +93,16 @@ export default function Login() {
           {accountExists ? (
             <p className="text-center text-sm text-red-500">
               This email is already registered.{" "}
-              <Link href="/login" className="font-semibold text-red-600">
-                Log in
+              <Link href="/login">
+                <a className="font-semibold text-red-600">Log in</a>
               </Link>{" "}
               instead?
             </p>
           ) : (
             <p className="text-center text-sm text-gray-600">
               Already registered?{" "}
-              <Link href="/login" className="font-semibold text-gray-800">
-                Sign in
+              <Link href="/login">
+                <a className="font-semibold text-gray-800">Sign in</a>
               </Link>{" "}
               to your account.
             </p>
