@@ -43,8 +43,7 @@ function InviteTeammateModal({
           />
           <h3 className="text-lg font-medium">Invite Teammate</h3>
           <p className="text-center text-sm text-gray-500">
-            Invite a teammate to join your project. Invitations will be valid
-            for 7 days.
+            팀멤버를 프로젝트에 초대하세요. 초대는 7일간 유효합니다.
           </p>
         </div>
 
@@ -73,14 +72,14 @@ function InviteTeammateModal({
         >
           <div>
             <label htmlFor="email" className="block text-sm text-gray-700">
-              Email
+              이메일
             </label>
             <div className="relative mt-1 rounded-md shadow-sm">
               <input
                 type="email"
                 name="email"
                 id="email"
-                placeholder="acmest@biblic.net"
+                placeholder="acmest@acme.st"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -100,7 +99,7 @@ function InviteTeammateModal({
             {state === "inviting" ? (
               <LoadingDots color="#808080" />
             ) : (
-              <p>Send invite</p>
+              <p>초대 보내기</p>
             )}
           </button>
           {error && <p className="text-center text-xs text-red-500">{error}</p>}

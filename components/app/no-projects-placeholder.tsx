@@ -9,25 +9,26 @@ export default function NoProjectsPlaceholder({
   return (
     <div className="flex flex-col items-center justify-center rounded-md border border-gray-200 bg-white py-12">
       <h2 className="z-10 text-xl font-semibold text-gray-700">
-        You don't have any projects yet!
+        아직 프로젝트가 없습니다!
       </h2>
       <BlurImage
         src="/_static/illustrations/shopping-call.svg"
         alt="No links yet"
         width={400}
         height={400}
-        className="-my-8"
+        className="pointer-events-none -my-8"
       />
       <button
         onClick={() => setShowAddProjectModal(true)}
-        className="z-10 rounded-md border border-black bg-black px-10 py-2 text-sm font-medium text-white transition-all duration-75 hover:bg-white hover:text-black active:scale-95"
+        className="rounded-md border border-black bg-black px-10 py-2 text-sm font-medium text-white transition-all duration-75 hover:bg-white hover:text-black active:scale-95"
       >
-        Create a project
+        프로젝트 만들기
       </button>
-      <Link href="/links">
-        <a className="mt-3 text-sm font-medium text-gray-500 transition-all hover:text-gray-800 active:scale-95">
-          Add a acme.st link instead
-        </a>
+      <Link
+        href="/links"
+        className="mt-3 text-sm font-medium text-gray-500 transition-all hover:text-gray-800 active:scale-95"
+      >
+        Acme.st 링크 추가
       </Link>
     </div>
   );

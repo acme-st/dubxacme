@@ -25,18 +25,17 @@ export default function DomainConfiguration({
     );
     return (
       <div className="border-t border-gray-200 pt-5">
-        <p className="mb-5 text-sm">
-          Please set the following TXT record on{" "}
-          <InlineSnippet>{domainJson.apexName}</InlineSnippet> to prove
-          ownership of <InlineSnippet>{domainJson.name}</InlineSnippet>:
+        <p className="text-sm">
+          <InlineSnippet>{domainJson.name}</InlineSnippet> 도메인 소유 확인을 위해 다음 정보를{" "}
+          <InlineSnippet>{domainJson.apexName}</InlineSnippet> TXT 레코드에 추가 :
         </p>
-        <div className="flex items-start justify-start space-x-10 rounded-md bg-gray-50 p-2">
+        <div className="my-5 flex items-start justify-start space-x-10 rounded-md bg-gray-50 p-2">
           <div>
-            <p className="text-sm font-bold">Type</p>
+            <p className="text-sm font-bold">타입</p>
             <p className="mt-2 font-mono text-sm">{txtVerification.type}</p>
           </div>
           <div>
-            <p className="text-sm font-bold">Name</p>
+            <p className="text-sm font-bold">이름</p>
             <p className="mt-2 font-mono text-sm">
               {txtVerification.domain.slice(
                 0,
@@ -45,12 +44,16 @@ export default function DomainConfiguration({
             </p>
           </div>
           <div>
-            <p className="text-sm font-bold">Value</p>
+            <p className="text-sm font-bold">값</p>
             <p className="mt-2 font-mono text-sm">
               <span className="text-ellipsis">{txtVerification.value}</span>
             </p>
           </div>
         </div>
+        <p className="text-sm">
+          주의: 이 도메인을 다른 사이트에 사용하면 설정한 TXT 레코드의 소유권 확인이 사라집니다.
+          TXT 레코드 설정 시 유의하세요.
+        </p>
       </div>
     );
   }
@@ -74,7 +77,7 @@ export default function DomainConfiguration({
               : "border-white text-gray-400"
           } ease border-b-2 pb-1 text-sm transition-all duration-150`}
         >
-          A Record{!subdomain && " (recommended)"}
+          A 레코드{!subdomain && " (recommended)"}
         </button>
         <button
           onClick={() => setRecordType("CNAME")}
@@ -84,31 +87,31 @@ export default function DomainConfiguration({
               : "border-white text-gray-400"
           } ease border-b-2 pb-1 text-sm transition-all duration-150`}
         >
-          CNAME Record{subdomain && " (recommended)"}
+          CNAME 레코드{subdomain && " (recommended)"}
         </button>
       </div>
       <div className="my-3 text-left">
         <p className="my-5 text-sm">
-          To configure your {recordType === "A" ? "apex domain" : "subdomain"} (
+          설정을 위해 {recordType === "A" ? "apex domain" : "subdomain"} (
           <InlineSnippet>
             {recordType === "A" ? domainJson.apexName : domainJson.name}
           </InlineSnippet>
-          ), set the following {recordType} record on your DNS provider to
-          continue:
+          ), 다음 {recordType} 값을 DNS 제공사에서
+          추가하세요:
         </p>
         <div className="flex items-center justify-start space-x-10 rounded-md bg-gray-50 p-2">
           <div>
-            <p className="text-sm font-bold">Type</p>
+            <p className="text-sm font-bold">타입</p>
             <p className="mt-2 font-mono text-sm">{recordType}</p>
           </div>
           <div>
-            <p className="text-sm font-bold">Name</p>
+            <p className="text-sm font-bold">이름</p>
             <p className="mt-2 font-mono text-sm">
               {recordType === "A" ? "@" : subdomain ?? "www"}
             </p>
           </div>
           <div>
-            <p className="text-sm font-bold">Value</p>
+            <p className="text-sm font-bold">값</p>
             <p className="mt-2 font-mono text-sm">
               {recordType === "A" ? `76.76.21.21` : `cname.acme.st`}
             </p>
@@ -118,9 +121,9 @@ export default function DomainConfiguration({
             <p className="mt-2 font-mono text-sm">86400</p>
           </div>
         </div>
-        <p className="mt-3 text-sm">
-          Note: for TTL, if <InlineSnippet>86400</InlineSnippet> is not
-          available, set the highest value possible
+        <p className="mt-5 text-sm">
+          참고: TTL값으로 <InlineSnippet>86400</InlineSnippet> 설정이 어렵다면
+          가장 높은 값을 설정해 주세요. 또한 도메인 정보 전파는 1시간 이상 소요될 수 있습니다.
         </p>
       </div>
     </div>

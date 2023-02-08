@@ -8,7 +8,7 @@ export default withProjectAuth(
     if (!slug || typeof slug !== "string") {
       return res
         .status(400)
-        .json({ error: "Missing or misconfigured project slug" });
+        .json({ error: "프로젝트 슬러그가 없거나 잘못되었습니다." });
     }
 
     // GET /api/projects/[slug]/usage – get the usage stats specific project (dependent on owner's plan)

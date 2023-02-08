@@ -25,21 +25,21 @@ export default function ProjectInvite({
       <Head />
       <MjmlBody width={500}>
         <MjmlWrapper cssClass="container">
-          <Header title="Your ACMEST Invite" />
+          <Header title="Your ACME.ST Invite" />
           <MjmlSection cssClass="smooth">
             <MjmlColumn>
               <MjmlText cssClass="paragraph">
-                You've been invited to join the <strong>{projectName}</strong>{" "}
-                project on ACMEST!
+                ACME.ST 프로젝트 <strong>{projectName}</strong>{" "}
+                초대합니다!
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                You can use the magic link below to sign in to ACMEST and join the
-                project.
+                매직 링크를 눌러서 계정에 로그인하고 
+                프로젝트에 참여해 주세요.
               </MjmlText>
-              <ButtonPrimary link={url} uiText="Join Project" />
+              <ButtonPrimary link={url} uiText="프로젝트 참여" />
               <MjmlText cssClass="paragraph">
-                If you're on a mobile device, you can also copy the link below
-                and paste it into the browser of your choice.
+                링크가 비활성화된 디바이스라면
+                링크를 복사해서 브라우저에 넣어주셔도 됩니다.
               </MjmlText>
               <MjmlText cssClass="paragraph">
                 <a
@@ -53,7 +53,7 @@ export default function ProjectInvite({
                 </a>
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                If you did not request this email, you can safely ignore it.
+                요청한 적이 없다면 이 메일을 무시해 주세요.
               </MjmlText>
               <Divider />
             </MjmlColumn>

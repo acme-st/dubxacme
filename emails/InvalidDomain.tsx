@@ -30,9 +30,9 @@ export default function InvalidDomain({
           <Header title="Invalid Domain Configuration" />
           <MjmlSection cssClass="smooth">
             <MjmlColumn>
-              <MjmlText cssClass="paragraph">Hey there!</MjmlText>
+              <MjmlText cssClass="paragraph">안녕하세요!</MjmlText>
               <MjmlText cssClass="paragraph">
-                I did a scan of all our projects and noticed that your domain{" "}
+                고객님의{" "}
                 <code>
                   <a
                     rel="nofollow"
@@ -44,30 +44,30 @@ export default function InvalidDomain({
                     {domain}
                   </a>
                 </code>{" "}
-                for your ACMEST project{" "}
+                ACME.ST 프로젝트{" "}
                 <a href={`https://app.acme.st/${projectSlug}`} target="_blank">
                   {projectSlug}↗
                 </a>{" "}
-                has been invalid for {invalidDays} days.
+                커스텀 도메인이 {invalidDays} 일 동안 완료되지 않았습니다.
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                If your domain remains unconfigured for 30 days, your project
-                will be automatically deleted. Please click the link below to
-                configure your domain.
+                연결을 시도한 도메인이 제대로 설정되지 않고 30일이 경과하면
+                프로젝트와 모든 설정 데이터가 자동으로 삭제됩니다.
+                아래 링크에서 설정을 완료해 주세요.
               </MjmlText>
               <ButtonPrimary
                 link={`https://app.acme.st/${projectSlug}/settings`}
-                uiText="Configure my domain"
+                uiText="내 도메인 설정"
               />
               <MjmlText cssClass="paragraph">
-                If you do not want to keep this project on ACMEST, you can{" "}
+                ACME.ST 프로젝트가 필요하지 않다면{" "}
                 <a
                   href={`https://app.acme.st/${projectSlug}/settings`}
                   target="_blank"
                 >
-                  delete it
+                  삭제
                 </a>{" "}
-                or simply ignore this email. To respect your inbox,{" "}
+                  하거나 또는 이 메일을 무시하고 그냥 두셔도 됩니다.{" "}
                 {invalidDays < 28
                   ? `I will only send you one more email about this in ${
                       28 - invalidDays
@@ -75,7 +75,7 @@ export default function InvalidDomain({
                   : "this will be the last time I'll email you about this."}
               </MjmlText>
               <MjmlText cssClass="paragraph" color={grayDark}>
-              Acme.st - ACME ShorTner
+                애크미쇼트너 ACME.ST
               </MjmlText>
               <Divider />
             </MjmlColumn>

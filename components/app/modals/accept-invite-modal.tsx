@@ -41,13 +41,13 @@ function AcceptInviteModal({
               width={20}
               height={20}
             />
-            <h3 className="text-lg font-medium">Project Invitation</h3>
+            <h3 className="text-lg font-medium">프로젝트 초대</h3>
             <p className="text-center text-sm text-gray-500">
-              You've been invited to join and collaborate on the{" "}
+              다음 프로젝트에서 당신을 초대합니다. 참여하고 협업하세요.{" "}
               <span className="font-mono text-purple-600">
                 {slug || "......"}
               </span>{" "}
-              project on Acme.st
+              애크미쇼트너 프로젝트
             </p>
           </div>
           <div className="flex flex-col space-y-6 bg-gray-50 px-4 py-8 text-left sm:px-16">
@@ -59,6 +59,7 @@ function AcceptInviteModal({
                   headers: { "Content-Type": "application/json" },
                 }).then(() => {
                   toast.success("You now are a part of this project!");
+                  mutate(`/api/projects`);
                   mutate(`/api/projects/${slug}`);
                   mutate(`/api/projects/${slug}/users`);
                 });
@@ -73,7 +74,7 @@ function AcceptInviteModal({
               {accepting ? (
                 <LoadingDots color="#808080" />
               ) : (
-                <p>Accept invite</p>
+                <p>초대 승인</p>
               )}
             </button>
           </div>
@@ -88,16 +89,17 @@ function AcceptInviteModal({
               width={20}
               height={20}
             />
-            <h3 className="text-lg font-medium">Project Invitation Expired</h3>
+            <h3 className="text-lg font-medium">프로젝트 초대 만료</h3>
             <p className="text-center text-sm text-gray-500">
-              This invite has expired or is no longer valid.
+              이 초대는 만료되었거나 유효하지 않습니다.
             </p>
           </div>
           <div className="flex flex-col space-y-6 bg-gray-50 px-4 py-8 text-left sm:px-16">
-            <Link href="/">
-              <a className="flex h-10 w-full items-center justify-center rounded-md border border-black bg-black text-sm text-white transition-all hover:bg-white hover:text-black focus:outline-none">
-                Back to dashboard
-              </a>
+            <Link
+              href="/"
+              className="flex h-10 w-full items-center justify-center rounded-md border border-black bg-black text-sm text-white transition-all hover:bg-white hover:text-black focus:outline-none"
+            >
+              대시보드로 돌아가기
             </Link>
           </div>
         </div>

@@ -5,6 +5,7 @@ import WelcomeEmail from "emails/WelcomeEmail";
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
 import prisma from "@/lib/prisma";
+import { getBlackListedEmails } from "@/lib/utils";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
 
@@ -13,7 +14,7 @@ export const authOptions: NextAuthOptions = {
     EmailProvider({
       sendVerificationRequest({ identifier, url }) {
         sendMail({
-          subject: "Your acme.st Login Link",
+          subject: "Your Acme.st Login Link",
           to: identifier,
           component: <LoginLink url={url} />,
         });
@@ -36,6 +37,23 @@ export const authOptions: NextAuthOptions = {
     },
   },
   callbacks: {
+    signIn: async ({ user }) => {
+      const BLACKLISTED_EMAILS = await getBlackListedEmails();
+      if (BLACKLISTED_EMAILS.has(user.email)) {
+        return false;
+      }
+      return true;
+    },
+    jwt: async ({ token, account }) => {
+      const BLACKLISTED_EMAILS = await getBlackListedEmails();
+      if (BLACKLISTED_EMAILS.has(token.email)) {
+        return {};
+      }
+      if (account) {
+        token.accessToken = account.access_token;
+      }
+      return token;
+    },
     session: async ({ session, token }) => {
       session.user = {
         // @ts-ignore
@@ -51,7 +69,7 @@ export const authOptions: NextAuthOptions = {
         const email = message.user.email;
         await Promise.all([
           sendMarketingMail({
-            subject: "✨ Welcome to acmest",
+            subject: "✨ Welcome to ACME.ST",
             to: email,
             component: <WelcomeEmail />,
           }),

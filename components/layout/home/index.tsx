@@ -1,67 +1,72 @@
-import Image from "next/future/image";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { useSession } from "next-auth/react";
 import { Github, Logo, Twitter } from "@/components/shared/icons";
 import Meta from "../meta";
+import { motion, AnimatePresence } from "framer-motion";
+import { FADE_IN_ANIMATION_SETTINGS } from "@/lib/constants";
 
 export default function HomeLayout({
+  meta,
   children,
-  domain,
 }: {
+  meta?: {
+    title?: string;
+    description?: string;
+    image?: string;
+  };
   children: ReactNode;
-  domain?: string;
 }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const { key } = router.query as { key?: string };
   return (
     <div className="flex min-h-screen flex-col justify-between">
-      <Meta />
+      <Meta {...meta} />
       <div className={`${key ? "bg-gray-50" : ""} z-20`}>
         <div className="mx-auto max-w-screen-xl px-5 md:px-20">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              {domain ? (
-                <a href="https://acme.st" target="_blank" rel="noreferrer">
-                  <Image
-                    src="/_static/logotype.svg"
-                    alt="acme.st logo"
-                    width={834}
-                    height={236}
-                    className="w-24"
-                  />
-                </a>
-              ) : (
-                <Link href="/">
-                  <a>
-                    <Image
-                      src="/_static/logotype.svg"
-                      alt="acme.st logo"
-                      width={834}
-                      height={236}
-                      className="w-24"
-                    />
-                  </a>
-                </Link>
-              )}
+              <Link href="/">
+                <Image
+                  src="/_static/logotype.svg"
+                  alt="Acme.st logo"
+                  width={834}
+                  height={236}
+                  className="w-24"
+                />
+              </Link>
             </div>
-            {session ? (
-              <a
-                href="https://app.acme.st"
-                className="rounded-full border border-black bg-black py-1.5 px-5 text-sm text-white transition-all hover:bg-white hover:text-black"
-              >
-                Dashboard
-              </a>
-            ) : (
-              <a
-                href="https://app.acme.st/login"
-                className="rounded-full border border-black bg-black py-1.5 px-5 text-sm text-white transition-all hover:bg-white hover:text-black"
-              >
-                Sign in
-              </a>
-            )}
+
+            <AnimatePresence>
+              {!session && status !== "loading" ? (
+                <motion.a
+                  {...FADE_IN_ANIMATION_SETTINGS}
+                  href={
+                    process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+                      ? "https://app.acme.st/login"
+                      : "http://app.localhost:3000/login"
+                  }
+                  className="rounded-full border border-black bg-black py-1.5 px-5 text-sm text-white transition-all hover:bg-white hover:text-black"
+                >
+                  로그인
+                </motion.a>
+              ) : (
+                <motion.a
+                  {...FADE_IN_ANIMATION_SETTINGS}
+                  href={
+                    process.env.NEXT_PUBLIC_VERCEL_ENV === "production"
+                      ? "https://app.acme.st"
+                      : "http://app.localhost:3000"
+                  }
+                  className="rounded-full border border-black bg-black py-1.5 px-5 text-sm text-white transition-all hover:bg-white hover:text-black"
+                >
+                  대시보드
+                </motion.a>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -71,19 +76,10 @@ export default function HomeLayout({
           <span className="sr-only">Twitter</span>
           <Twitter className="h-6 w-6 text-gray-600" />
         </a>
-        {domain ? (
-          <a href="https://acme.st" target="_blank" rel="noreferrer">
-            <span className="sr-only">acme.st Logo</span>
-            <Logo className="h-7 w-7 text-gray-600" />
-          </a>
-        ) : (
-          <Link href="/">
-            <a>
-              <span className="sr-only">acme.st Logo</span>
-              <Logo className="h-7 w-7 text-gray-600" />
-            </a>
-          </Link>
-        )}
+        <Link href="/">
+          <span className="sr-only">Acme.st Logo</span>
+          <Logo className="h-7 w-7 text-gray-600" />
+        </Link>
         <a
           href="https://github.com/"
           target="_blank"

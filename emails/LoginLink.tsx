@@ -22,14 +22,14 @@ export default function LoginLink({ url }: { url: string }): JSX.Element {
           <Header title="Your Login Link" />
           <MjmlSection cssClass="smooth">
             <MjmlColumn>
-              <MjmlText cssClass="paragraph">Welcome to ACMEST!</MjmlText>
+              <MjmlText cssClass="paragraph">드디어 ACME.ST에 오신 것을 환영합니다!</MjmlText>
               <MjmlText cssClass="paragraph">
-                Please click the magic link below to sign in to your account.
-              </MjmlText>
-              <ButtonPrimary link={url} uiText="Sign In" />
+                매직 링크를 눌러서 계정에 로그인해 주세요.
+               </MjmlText>
+              <ButtonPrimary link={url} uiText="로그인" />
               <MjmlText cssClass="paragraph">
-                If you're on a mobile device, you can also copy the link below
-                and paste it into the browser of your choice.
+                링크가 비활성화된 디바이스라면
+                링크를 복사해서 브라우저에 넣어주셔도 됩니다.
               </MjmlText>
               <MjmlText cssClass="paragraph">
                 <a
@@ -43,7 +43,7 @@ export default function LoginLink({ url }: { url: string }): JSX.Element {
                 </a>
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                If you did not request this email, you can safely ignore it.
+                로그인을 요청하지 않으셨다면 이 메일은 무시해 주세요.
               </MjmlText>
               <Divider />
             </MjmlColumn>

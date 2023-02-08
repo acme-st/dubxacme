@@ -40,6 +40,7 @@ export default function Tooltip({
   return (
     <>
       <button
+        type="button"
         className={`${fullWidth ? "w-full" : "inline-flex"} sm:hidden`}
         onClick={() => setOpenTooltip(true)}
       >
@@ -100,7 +101,7 @@ export default function Tooltip({
           <TooltipPrimitive.Content
             sideOffset={4}
             side="top"
-            className="z-20 hidden animate-slide-up-fade items-center overflow-hidden rounded-md border border-gray-200 bg-white drop-shadow-lg sm:block"
+            className="z-30 hidden animate-slide-up-fade items-center overflow-hidden rounded-md border border-gray-200 bg-white drop-shadow-lg sm:block"
           >
             <TooltipPrimitive.Arrow className="fill-current text-white" />
             {typeof content === "string" ? (
@@ -133,10 +134,11 @@ export function TooltipContent({
     <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
       <p className="text-sm text-gray-700">{title}</p>
       {cta && ctaLink && (
-        <Link href={ctaLink}>
-          <a className="mt-4 rounded-full border border-black bg-black py-1.5 px-3 text-sm text-white transition-all hover:bg-white hover:text-black">
-            {cta}
-          </a>
+        <Link
+          href={ctaLink}
+          className="mt-4 rounded-full border border-black bg-black py-1.5 px-3 text-sm text-white transition-all hover:bg-white hover:text-black"
+        >
+          {cta}
         </Link>
       )}
     </div>
@@ -154,9 +156,9 @@ export function OGImageProxy() {
         className="w-full overflow-hidden rounded-md shadow-md"
       />
       <p className="text-sm text-gray-700">
-        Add a custom OG image in front of your target URL. Bots like
-        Twitter/Facebook will be served this image, while users will be
-        redirected to your target URL.
+        커스텀 오픈그래프(OG) 이미지를 타겟 URL에 추가하면 
+        트위터와 페이스북과 같은 봇이 해당 이미지와 정보를 제공하여 보여주고
+        사용자는 타겟 URL로 리디렉션합니다.
       </p>
     </div>
   );
@@ -187,7 +189,7 @@ export function ProTiers({ usageLimit }: { usageLimit?: number }) {
           maxValue={PRO_TIERS.length - 1}
         />
         <p className="text-sm text-gray-700">
-          Up to {nFormatter(PRO_TIERS[tier].quota)} link clicks/mo
+          제한 {nFormatter(PRO_TIERS[tier].quota)} 링크클릭/월
         </p>
       </div>
     </div>

@@ -1,10 +1,11 @@
 import sendMail from "emails";
 import InvalidDomain from "emails/InvalidDomain";
 import ProjectDeleted from "emails/ProjectDeleted";
-import { log } from "@/lib/cron/utils";
+import { log } from "@/lib/utils";
 import { removeDomain } from "@/lib/domains";
 import prisma from "@/lib/prisma";
-import { deleteProject, redis } from "@/lib/upstash";
+import { deleteProjectLinks } from "@/lib/api/links";
+import { getClicksUsage } from "@/lib/tinybird";
 
 export const handleDomainUpdates = async (
   projectSlug: string,
@@ -15,7 +16,7 @@ export const handleDomainUpdates = async (
   sentEmails: string[],
 ) => {
   if (changed) {
-    await log(`Domain *${domain}* changed status to *${verified}*`);
+    await log(`Domain *${domain}* changed status to *${verified}*`, "cron");
   }
 
   if (verified) return;
@@ -41,9 +42,9 @@ export const handleDomainUpdates = async (
   }
 
   if (invalidDays >= 30) {
-    const hasLinks = await redis.exists(`${domain}:links`);
-    if (hasLinks === 0) {
-      // only delete if there are no resources recorded (links, stats, etc.)
+    const clicks = await getClicksUsage({ domain });
+    // only delete if there are no clicks recorded in Tinybird
+    if (clicks === 0) {
       const ownerEmail = await getProjectOwnerEmail(projectSlug);
       return await Promise.all([
         prisma.project.delete({
@@ -52,8 +53,11 @@ export const handleDomainUpdates = async (
           },
         }),
         removeDomain(domain),
-        deleteProject(domain),
-        log(`Domain *${domain}* has been invalid for > 30 days, deleting.`),
+        deleteProjectLinks(domain),
+        log(
+          `Domain *${domain}* has been invalid for > 30 days, deleting.`,
+          "cron",
+        ),
         sendMail({
           subject: `Your project ${projectSlug} has been deleted`,
           to: ownerEmail,
@@ -64,7 +68,8 @@ export const handleDomainUpdates = async (
       ]);
     } else {
       return await log(
-        `Domain *${domain}* has been invalid for > 30 days but has links, not deleting.`,
+        `Domain *${domain}* has been invalid for > 30 days but has link clicks, not deleting.`,
+        "cron",
       );
     }
   }
@@ -79,7 +84,10 @@ const sendDomainInvalidEmail = async (
 ) => {
   const ownerEmail = await getProjectOwnerEmail(projectSlug);
   return await Promise.all([
-    log(`Domain *${domain}* is invalid for ${invalidDays} days, email sent.`),
+    log(
+      `Domain *${domain}* is invalid for ${invalidDays} days, email sent.`,
+      "cron",
+    ),
     sendMail({
       subject: `Your domain ${domain} needs to be configured`,
       to: ownerEmail,

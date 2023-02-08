@@ -32,10 +32,9 @@ export default function UsageExceeded({
           <Header title="Usage Limit Exceeded" />
           <MjmlSection cssClass="smooth">
             <MjmlColumn>
-              <MjmlText cssClass="paragraph">Hey there!</MjmlText>
+              <MjmlText cssClass="paragraph">안녕하세요!</MjmlText>
               <MjmlText cssClass="paragraph">
-                Just wanted to reach out and let you know that your account has
-                exceeded the
+                애크미쇼트너 어카운트 제한을 초과하였습니다.
                 <strong> {getPlanFromUsageLimit(usageLimit)} Plan </strong>
                 limit of <strong>{nFormatter(usageLimit)} link clicks</strong>.
                 You have used{" "}
@@ -43,24 +42,22 @@ export default function UsageExceeded({
                 your projects in your current billing cycle.
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                All your existing links will continue to work, and I'm still
-                collecting data on them, but you'll need to upgrade to view
-                their stats, edit them, or add more links.
+                데이터는 유지되고 링크는 정상 작동합니다. 
+                수정 및 관리, 링크 추가를 위해서는 플랜 업그레이드가 필요합니다.
               </MjmlText>
               <ButtonPrimary
                 link={`https://app.acme.st/settings`}
-                uiText="Upgrade my plan"
+                uiText="플랜 업그레이드"
               />
               <MjmlText cssClass="paragraph">
                 To respect your inbox,{" "}
                 {type === "first"
                   ? "I will only send you one more email about this in 3 days"
                   : "this will be the last time I'll email you about this"}
-                . Feel free to ignore this email if you don't plan on upgrading,
-                or reply to let me know if you have any questions!
+                업그레이드 할 계획이 없으시다면 이 메일은 무시해 주세요. 문의사항은 언제든지 연락해 주세요.
               </MjmlText>
               <MjmlText cssClass="paragraph" color={grayDark}>
-              Acme.st - ACME ShorTner
+                애크미쇼트너 ACME.ST
               </MjmlText>
               <Divider />
             </MjmlColumn>

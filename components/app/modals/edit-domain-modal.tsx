@@ -60,8 +60,7 @@ function EditDomainModal({
           />
           <h3 className="text-lg font-medium">Change Domain</h3>
           <p className="text-center text-sm text-gray-500">
-            Warning: Changing your project's domain will break all existing
-            short links.
+            주의: 프로젝트 도메인을 변경하면 기존의 모든 단축 링크와 통계가 초기화 됩니다.
           </p>
         </div>
 
@@ -97,7 +96,7 @@ function EditDomainModal({
               htmlFor="old-domain"
               className="block text-sm font-medium text-gray-700"
             >
-              Old Domain
+              이전 도메인
             </label>
             <div className="relative mt-1 rounded-md shadow-sm">
               <input
@@ -117,7 +116,7 @@ function EditDomainModal({
               htmlFor="new-domain"
               className="block text-sm font-medium text-gray-700"
             >
-              New Domain
+              새 도메인
             </label>
             <div className="relative mt-1 rounded-md shadow-sm">
               <input
@@ -153,14 +152,14 @@ function EditDomainModal({
             {domainError &&
               (domainError === "Domain is already in use." ? (
                 <p className="mt-2 text-sm text-red-600" id="domain-error">
-                  Domain is already in use.{" "}
+                  도메인이 이미 사용중 입니다. 이 도메인을 사용하려면{" "}
                   <a
                     className="underline"
                     href="mailto:acmest@biblic.net?subject=My Domain Is Already In Use"
                   >
-                    Contact us
+                    연락
                   </a>{" "}
-                  if you'd like to use this domain for your project.
+                  해 주세요.
                 </p>
               ) : (
                 <p className="mt-2 text-sm text-red-600" id="domain-error">
@@ -174,11 +173,11 @@ function EditDomainModal({
               htmlFor="verification"
               className="block text-sm text-gray-700"
             >
-              To verify, type{" "}
+              확인을 위해 {" "}
               <span className="font-semibold text-red-600">
                 yes, change my domain
               </span>{" "}
-              below
+              을 입력해 주세요.
             </label>
             <div className="relative mt-1 rounded-md shadow-sm">
               <input
@@ -205,7 +204,7 @@ function EditDomainModal({
             {saving ? (
               <LoadingDots color="#808080" />
             ) : (
-              <p>Confirm domain change</p>
+              <p>도메인 변경 확인</p>
             )}
           </button>
         </form>

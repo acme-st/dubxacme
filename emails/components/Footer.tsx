@@ -11,20 +11,19 @@ export default function Footer({
     <MjmlSection cssClass="smooth">
       <MjmlColumn>
         <MjmlText cssClass="footer">
-          © {new Date().getFullYear()} acme.st
+          © {new Date().getFullYear()} Acme.st
           {unsubscribe && (
             <>
               &nbsp;&nbsp;·&nbsp;&nbsp;
               <a href="{{{ pm:unsubscribe }}}" target="_blank">
-                Unsubscribe
+                수신거부
               </a>
             </>
           )}
         </MjmlText>
         {footnote && (
           <MjmlText cssClass="footer">
-            If you have any feedback or questions about this email, simply reply
-            to it. I'd love to hear from you!
+            피드백, 문의는 언제라도 답장으로 보내 주세요.
           </MjmlText>
         )}
       </MjmlColumn>

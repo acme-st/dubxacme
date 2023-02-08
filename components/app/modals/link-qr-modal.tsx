@@ -8,7 +8,7 @@ import {
 } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import BlurImage from "@/components/shared/blur-image";
-import { ChevronRight, Download, Logo } from "@/components/shared/icons";
+import { ChevronRight, Clipboard, Logo } from "@/components/shared/icons";
 import Modal from "@/components/shared/modal";
 import Switch from "@/components/shared/switch";
 import Tooltip, { TooltipContent } from "@/components/shared/tooltip";
@@ -17,6 +17,11 @@ import useProject from "@/lib/swr/use-project";
 import useUsage from "@/lib/swr/use-usage";
 import { SimpleLinkProps } from "@/lib/types";
 import { getApexDomain, linkConstructor } from "@/lib/utils";
+import IconMenu from "@/components/shared/icon-menu";
+import { Download, Photo } from "@/components/shared/icons";
+import Popover from "@/components/shared/popover";
+import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 function LinkQRModalHelper({
   showLinkQRModal,
@@ -41,17 +46,12 @@ function LinkQRModalHelper({
     }
   }, [props]);
 
-  const qrDestUrl = useMemo(
-    () => linkConstructor({ key: props.key, domain }),
-    [props, domain],
-  );
-
   const qrLogoUrl = useMemo(() => {
     if (logo) return logo;
     return typeof window !== "undefined" && window.location.origin
       ? new URL("/_static/logo.svg", window.location.origin).href
       : "";
-  }, []);
+  }, [logo]);
 
   function download(url: string, extension: string) {
     if (!anchorRef.current) return;
@@ -61,21 +61,37 @@ function LinkQRModalHelper({
   }
 
   const [showLogo, setShowLogo] = useState(true);
-  const [qrData, setQrData] = useState({
-    value: qrDestUrl,
-    bgColor: "#ffffff",
-    fgColor: "#000000",
-    size: 1024,
-    level: "Q", // QR Code error correction level: https://blog.qrstuff.com/general/qr-code-error-correction
-    ...(showLogo && {
-      imageSettings: {
-        src: qrLogoUrl,
-        height: 256,
-        width: 256,
-        excavate: true,
-      },
+  const [fgColor, setFgColor] = useState("#000000");
+  const qrData = useMemo(
+    () => ({
+      value: linkConstructor({ key: props.key, domain }),
+      bgColor: "#ffffff",
+      fgColor,
+      size: 1024,
+      level: "Q", // QR Code error correction level: https://blog.qrstuff.com/general/qr-code-error-correction
+      ...(showLogo && {
+        imageSettings: {
+          src: qrLogoUrl,
+          height: 256,
+          width: 256,
+          excavate: true,
+        },
+      }),
     }),
-  });
+    [props.key, domain, fgColor, showLogo, qrLogoUrl],
+  );
+
+  const copyToClipboard = async () => {
+    try {
+      const canvas = await getQRAsCanvas(qrData, "image/png", true);
+      (canvas as HTMLCanvasElement).toBlob(async function (blob) {
+        const item = new ClipboardItem({ "image/png": blob });
+        await navigator.clipboard.write([item]);
+      });
+    } catch (e) {
+      throw e;
+    }
+  };
 
   return (
     <Modal showModal={showLinkQRModal} setShowModal={setShowLinkQRModal}>
@@ -92,7 +108,7 @@ function LinkQRModalHelper({
           ) : (
             <Logo className="h-10 w-10" />
           )}
-          <h3 className="text-lg font-medium">Download QR Code</h3>
+          <h3 className="text-lg font-medium">QR코드 다운로드</h3>
         </div>
 
         <div className="flex flex-col space-y-6 bg-gray-50 py-6 text-left sm:rounded-b-2xl">
@@ -116,46 +132,29 @@ function LinkQRModalHelper({
 
           <AdvancedSettings
             qrData={qrData}
-            setQrData={setQrData}
+            setFgColor={setFgColor}
             setShowLogo={setShowLogo}
           />
 
-          <div className="flex gap-2 px-4 sm:px-16">
+          <div className="grid grid-cols-2 gap-2 px-4 sm:px-16">
             <button
-              onClick={async () =>
-                download(
-                  await getQRAsSVGDataUri({
-                    ...qrData,
-                    ...(showLogo && {
-                      imageSettings: {
-                        ...qrData.imageSettings,
-                        src: logo || "https://acme.st/_static/logo.svg",
-                      },
-                    }),
-                  }),
-                  "svg",
-                )
-              }
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-black bg-black py-1.5 px-5 text-sm text-white transition-all hover:bg-white hover:text-black"
+              onClick={async () => {
+                toast.promise(copyToClipboard(), {
+                  loading: "복사중이에요..",
+                  success: "복사완료!",
+                  error: "앗, 복사실패",
+                });
+              }}
+              className="flex items-center justify-center gap-2 rounded-md border border-black bg-black py-1.5 px-5 text-sm text-white transition-all hover:bg-white hover:text-black"
             >
-              <Download /> SVG
+              <Clipboard className="h-4 w-4" /> 복사
             </button>
-            <button
-              onClick={async () =>
-                download(await getQRAsCanvas(qrData, "image/png"), "png")
-              }
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-black bg-black py-1.5 px-5 text-sm text-white transition-all hover:bg-white hover:text-black"
-            >
-              <Download /> PNG
-            </button>
-            <button
-              onClick={async () =>
-                download(await getQRAsCanvas(qrData, "image/jpeg"), "jpg")
-              }
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-black bg-black py-1.5 px-5 text-sm text-white transition-all hover:bg-white hover:text-black"
-            >
-              <Download /> JPEG
-            </button>
+            <QrDropdown
+              download={download}
+              qrData={qrData}
+              showLogo={showLogo}
+              logo={qrLogoUrl}
+            />
           </div>
 
           {/* This will be used to prompt downloads. */}
@@ -170,8 +169,9 @@ function LinkQRModalHelper({
   );
 }
 
-function AdvancedSettings({ qrData, setQrData, setShowLogo }) {
-  const { plan } = useUsage();
+function AdvancedSettings({ qrData, setFgColor, setShowLogo }) {
+  const { data: session } = useSession();
+  const { plan } = session ? useUsage() : { plan: "free" };
   const [expanded, setExpanded] = useState(false);
 
   const isApp = useMemo(() => {
@@ -192,7 +192,7 @@ function AdvancedSettings({ qrData, setQrData, setShowLogo }) {
               expanded ? "rotate-90" : ""
             } transition-all`}
           />
-          <p className="text-sm text-gray-600">Advanced options</p>
+          <p className="text-sm text-gray-600">고급 옵션</p>
         </button>
       </div>
       {expanded && (
@@ -202,14 +202,14 @@ function AdvancedSettings({ qrData, setQrData, setShowLogo }) {
               htmlFor="logo-toggle"
               className="block text-sm font-medium text-gray-700"
             >
-              Logo
+              로고
             </label>
             {!plan || plan === "Free" ? (
               <Tooltip
                 content={
                   <TooltipContent
-                    title="ACMEST"
-                    cta="Upgrade to Pro"
+                    title="무료 플랜에서도 모든 기능은 동일합니다. Acme.st 로고를 삭제하거나 로고를 업로드하려면 플랜을 업그레이드 해주세요."
+                    cta="플랜 업그레이드"
                     ctaLink={isApp ? "/settings" : "/#pricing"}
                   />
                 }
@@ -222,7 +222,7 @@ function AdvancedSettings({ qrData, setQrData, setShowLogo }) {
                     thumbTranslate="translate-x-6"
                     disabled={true}
                   />
-                  <p className="text-sm text-gray-600">Show acme.st Logo</p>
+                  <p className="text-sm text-gray-600">Acme.st 로고 보여주기</p>
                 </div>
               </Tooltip>
             ) : (
@@ -233,7 +233,7 @@ function AdvancedSettings({ qrData, setQrData, setShowLogo }) {
                   thumbDimensions="w-5 h-5"
                   thumbTranslate="translate-x-6"
                 />
-                <p className="text-sm text-gray-600">Show acme.st Logo</p>
+                <p className="text-sm text-gray-600">Acme.st 로고 보여주기</p>
               </div>
             )}
           </div>
@@ -242,7 +242,7 @@ function AdvancedSettings({ qrData, setQrData, setShowLogo }) {
               htmlFor="color"
               className="block text-sm font-medium text-gray-700"
             >
-              Foreground Color
+              코드 색상
             </label>
             <div className="relative mt-1 flex h-9 w-48 rounded-md shadow-sm">
               <Tooltip
@@ -250,12 +250,7 @@ function AdvancedSettings({ qrData, setQrData, setShowLogo }) {
                   <div className="flex max-w-xs flex-col items-center space-y-3 p-5 text-center">
                     <HexColorPicker
                       color={qrData.fgColor}
-                      onChange={(color) =>
-                        setQrData({
-                          ...qrData,
-                          fgColor: color,
-                        })
-                      }
+                      onChange={(color) => setFgColor(color)}
                     />
                   </div>
                 }
@@ -272,12 +267,7 @@ function AdvancedSettings({ qrData, setQrData, setShowLogo }) {
                 id="color"
                 name="color"
                 color={qrData.fgColor}
-                onChange={(color) =>
-                  setQrData({
-                    ...qrData,
-                    fgColor: color,
-                  })
-                }
+                onChange={(color) => setFgColor(color)}
                 prefixed
                 style={{ borderColor: qrData.fgColor }}
                 className={`block w-full rounded-r-md border-2 border-l-0 pl-3 text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-black sm:text-sm`}
@@ -287,6 +277,66 @@ function AdvancedSettings({ qrData, setQrData, setShowLogo }) {
         </div>
       )}
     </div>
+  );
+}
+
+function QrDropdown({ download, qrData, showLogo, logo }) {
+  const [openPopover, setOpenPopover] = useState(false);
+  return (
+    <>
+      <Popover
+        content={
+          <div className="grid w-full gap-1 p-2 sm:w-40">
+            <button
+              onClick={() => {
+                download(
+                  getQRAsSVGDataUri({
+                    ...qrData,
+                    ...(showLogo && {
+                      imageSettings: {
+                        ...qrData.imageSettings,
+                        src: logo || "https://acme.st/_static/logo.svg",
+                      },
+                    }),
+                  }),
+                  "svg",
+                );
+              }}
+              className="w-full rounded-md p-2 text-left text-sm font-medium text-gray-500 transition-all duration-75 hover:bg-gray-100"
+            >
+              <IconMenu text="SVG" icon={<Photo className="h-4 w-4" />} />
+            </button>
+            <button
+              onClick={async () => {
+                download(await getQRAsCanvas(qrData, "image/png"), "png");
+              }}
+              className="w-full rounded-md p-2 text-left text-sm font-medium text-gray-500 transition-all duration-75 hover:bg-gray-100"
+            >
+              <IconMenu text="PNG" icon={<Photo className="h-4 w-4" />} />
+            </button>
+            <button
+              onClick={async () => {
+                download(await getQRAsCanvas(qrData, "image/jpeg"), "jpg");
+              }}
+              className="w-full rounded-md p-2 text-left text-sm font-medium text-gray-500 transition-all duration-75 hover:bg-gray-100"
+            >
+              <IconMenu text="JPEG" icon={<Photo className="h-4 w-4" />} />
+            </button>
+          </div>
+        }
+        align="center"
+        openPopover={openPopover}
+        setOpenPopover={setOpenPopover}
+      >
+        <button
+          onClick={() => setOpenPopover(!openPopover)}
+          className="flex w-full items-center justify-center gap-2 rounded-md border border-black bg-black py-1.5 px-5 text-sm text-white transition-all hover:bg-white hover:text-black"
+        >
+          <Download />
+          내보내기
+        </button>
+      </Popover>
+    </>
   );
 }
 
@@ -304,7 +354,7 @@ export function useLinkQRModal({ props }: { props: SimpleLinkProps }) {
   }, [showLinkQRModal, setShowLinkQRModal, props]);
 
   return useMemo(
-    () => ({ setShowLinkQRModal, LinkQRModal }),
-    [setShowLinkQRModal, LinkQRModal],
+    () => ({ showLinkQRModal, setShowLinkQRModal, LinkQRModal }),
+    [showLinkQRModal, setShowLinkQRModal, LinkQRModal],
   );
 }

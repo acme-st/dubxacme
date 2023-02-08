@@ -70,7 +70,7 @@ export default function ProjectSelect() {
                 `https://www.google.com/s2/favicons?sz=64&domain_url=${selected.domain}`
               }
               alt={selected.slug}
-              className="h-6 w-6 flex-shrink-0 overflow-hidden rounded-full sm:h-8 sm:w-8"
+              className="h-6 w-6 overflow-hidden rounded-full sm:h-8 sm:w-8"
               width={48}
               height={48}
             />
@@ -148,7 +148,7 @@ function ProjectList({
           className="flex w-full cursor-pointer items-center space-x-2 rounded-md p-2 transition-all duration-75 hover:bg-gray-100"
         >
           <PlusCircle className="h-7 w-7 text-gray-600" />
-          <span className="block truncate">Add a new project</span>
+          <span className="block truncate">새 프로젝트 추가</span>
         </button>
       )}
     </div>

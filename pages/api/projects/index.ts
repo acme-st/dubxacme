@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { getSession, Session, withUserAuth } from "@/lib/auth";
+import { Session, withUserAuth } from "@/lib/auth";
 import { DEFAULT_REDIRECTS, RESERVED_KEYS } from "@/lib/constants";
 import { addDomain, removeDomain } from "@/lib/domains";
 import prisma from "@/lib/prisma";
@@ -67,12 +67,22 @@ export default withUserAuth(
         });
       }
 
+      const { usageLimit: ownerUsageLimit } = await prisma.user.findUnique({
+        where: {
+          id: session.user.id,
+        },
+        select: {
+          usageLimit: true,
+        },
+      });
+
       const [prismaResponse, domainResponse] = await Promise.all([
         prisma.project.create({
           data: {
             name,
             slug,
             domain,
+            ownerUsageLimit,
             users: {
               create: {
                 userId: session.user.id,

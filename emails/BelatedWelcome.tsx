@@ -23,36 +23,26 @@ export default function WelcomeEmail({
       <Head />
       <MjmlBody width={500}>
         <MjmlWrapper cssClass="container">
-          <Header title="Welcome to ACMEST" />
+          <Header title="애크미쇼트너 ACME.ST의 환영 인사" />
           <MjmlSection padding="0">
             <MjmlColumn>
               <MjmlImage
                 cssClass="hero"
                 padding="0"
                 align="left"
-                src="https://raw.githubusercontent.com/steven-tey/dub/main/public/_static/thumbnail.png"
+                src="https://og-image.acme.st/**Welcome**%20to%20Acme.ST.png?theme=light&md=1&fontSize=100px&images=https%3A%2F%2Fog-image.acme.st%2Fimg%2Fbiblic.svg"
               />
             </MjmlColumn>
           </MjmlSection>
           <MjmlSection cssClass="smooth">
             <MjmlColumn>
               <MjmlText cssClass="paragraph">
-                Welcome to Acme.st - ACME ShorTner
-              </MjmlText>
-              <MjmlText cssClass="paragraph">
-              Acme.st - ACME ShorTner{" "}
-                <a
-                  href="https://twitter.com/steventey/status/1579471673325408257"
-                  target="_blank"
-                >
-                 Hello
-                </a>{" "}
-                Greeting
+                애크미쇼트너 ACME.ST의 환영 인사 
               </MjmlText>
               {domains ? (
                 <MjmlText cssClass="paragraph">
-                  I noticed that you've been successfully using ACMEST with your
-                  custom domain
+                  애크미쇼트너 ACME.ST 프로젝트에서
+                  커스텀 도메인 설정이 완료되었습니다.
                   {domains.length > 1 ? "s" : ""}{" "}
                   {domains.map((domain) => (
                     <span key={domain}>
@@ -70,32 +60,32 @@ export default function WelcomeEmail({
                       {", "}
                     </span>
                   ))}{" "}
-                  I'd love to hear from you!
+                  💌 피드백과 제안을 항상 기다립니다.
                 </MjmlText>
               ) : (
                 <MjmlText cssClass="paragraph">
-                  I noticed that you recently signed up for ACMEST but haven't
-                  successfully connected a custom domain yet, and I wanted to
-                  reach out to ask if you have any questions about that?
+                  애크미쇼트너에 최근 가입하셨지만
+                  아직 커스텀 도메인 기능을 사용하지 않고계셔서 안내해 드립니다.
+                  혹시 ACME.ST의 플랜을 확인해 보셨나요?
                 </MjmlText>
               )}
               <MjmlText cssClass="paragraph">
-                In case you missed it, I also revamped our pricing model and
-                made it more affordable for everyone. You can read more about it{" "}
+                확인 전이라면 커스텀 도메인 연결이 무료라는 점을 다시 한 번 확인해 주세요.
+                더 자세한 내용은 링크를 참고해 주세요.{" "}
                 <a
                   href="https://twitter.com/"
                   target="_blank"
                 >
-                  here
+                  여기
                 </a>
                 .
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                If you haven't already, here are a few more things you can do:
+                아래 내용들도 기억해 주세요:
               </MjmlText>
               <MjmlText cssClass="li">
                 •&nbsp;&nbsp;Follow us on{" "}
-                <a href="https://twitter.com" target="_blank">
+                <a href="https://twitter.com/" target="_blank">
                   Twitter
                 </a>
               </MjmlText>
@@ -107,18 +97,15 @@ export default function WelcomeEmail({
               </MjmlText>
               {domains ? (
                 <MjmlText cssClass="paragraph" color={grayDark}>
-                  P.S.: You'll receive an email from Trustpilot in the next
-                  couple of days - if you enjoyed using ACMEST, it would mean a lot
-                  if you could leave a review; if not, I'd love to hear what I
-                  can do to improve ACMEST!
+                  🎁🎁🎁🎁🎁
                 </MjmlText>
               ) : (
                 <MjmlText cssClass="paragraph">
-                  Looking forward to hearing from you!
+                  💌 피드백과 제안을 항상 기다립니다.
                 </MjmlText>
               )}
               <MjmlText cssClass="paragraph" color={grayDark}>
-              Acme.st - ACME ShorTner
+                애크미쇼트너 ACME.ST
               </MjmlText>
               <Divider />
             </MjmlColumn>

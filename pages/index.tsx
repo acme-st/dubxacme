@@ -1,7 +1,8 @@
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
+import prisma from "@/lib/prisma";
 import { useStatsModal } from "@/components/app/modals/stats-modal";
-import Background from "@/components/home/background";
+import Background from "@/components/shared/background";
 import Demo from "@/components/home/demo";
 import Features from "@/components/home/features";
 import Globe from "@/components/home/globe";
@@ -10,7 +11,13 @@ import Logos from "@/components/home/logos";
 import Pricing from "@/components/home/pricing";
 import HomeLayout from "@/components/layout/home";
 
-export default function Home({ stars }: { stars: number }) {
+export default function Home({
+  userCount,
+  stars,
+}: {
+  userCount: number;
+  stars: number;
+}) {
   const router = useRouter();
   const { key: stats } = router.query;
   const { setShowStatsModal, StatsModal } = useStatsModal();
@@ -40,40 +47,12 @@ export default function Home({ stars }: { stars: number }) {
       <div className="z-10">
         <Hero />
         <Demo />
-        {/*
         <Logos />
-        */}
         <Globe />
-        {/*
-        <Features stars={stars} />
+        <Features />
         <Pricing />
-        */}
       </div>
       <Background />
     </HomeLayout>
   );
 }
-
-{/*
-export async function getStaticProps() {
-  const { stargazers_count: stars } = await fetch(
-    "https://api.github.com/",
-    {
-      // optional – feel free to remove if you don't want to display star count
-      ...(process.env.GITHUB_OAUTH_TOKEN && {
-        headers: {
-          Authorization: `Bearer ${process.env.GITHUB_OAUTH_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      }),
-    },
-  ).then((res) => res.json());
-
-  return {
-    props: {
-      stars,
-    },
-    revalidate: 10,
-  };
-}
-*/}

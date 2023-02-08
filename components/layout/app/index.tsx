@@ -9,8 +9,6 @@ import Meta from "../meta";
 import ProjectSelect from "./project-select";
 import UserDropdown from "./user-dropdown";
 
-//const CRISP_SCRIPT = `window.$crisp=[];window.CRISP_WEBSITE_ID="2c09b1ee-14c2-46d1-bf72-1dbb998a19e0";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`;
-
 const NavTabs = dynamic(() => import("./nav-tabs"), {
   ssr: false,
   loading: () => <div className="-mb-0.5 h-12 w-full" />,
@@ -32,15 +30,14 @@ export default function AppLayout({
   return (
     <div>
       <Meta />
-      {/* 
       <Script
-        id="script-crisp"
         dangerouslySetInnerHTML={{
-          __html: CRISP_SCRIPT,
-        }}
-        strategy="lazyOnload"
-      />
-      */}
+          __html: `(function(){var w=window;if(w.ChannelIO){return w.console.error("ChannelIO script included twice.")}var ch=function(){ch.c(arguments)};ch.q=[];ch.c=function(args){ch.q.push(args)};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x)}}if(document.readyState==="complete"){l()}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l)}})();
+          ChannelIO('boot', {
+            "pluginKey": "20a7c878-a93a-4715-a38a-4b4e087c8f54"
+          });
+          `}} 
+         />
       <Toaster />
       <div
         className={`min-h-screen w-full ${bgWhite ? "bg-white" : "bg-gray-50"}`}
@@ -50,17 +47,18 @@ export default function AppLayout({
             <div className="flex h-16 items-center justify-between">
               <div className="flex items-center">
                 <Link href="/">
-                  <a>
-                    <Logo className="h-8 w-8 transition-all duration-75 active:scale-95" />
-                  </a>
+                  <Logo className="h-8 w-8 transition-all duration-75 active:scale-95" />
                 </Link>
                 <Divider className="h-8 w-8 text-gray-200 sm:ml-3" />
                 <ProjectSelect />
                 {key && slug && (
                   <>
                     <Divider className="h-8 w-8 text-gray-200 sm:mr-3" />
-                    <Link href={`/${slug}/${key}`}>
-                      <a className="text-sm font-medium">{key}</a>
+                    <Link
+                      href={`/${slug}/${key}`}
+                      className="text-sm font-medium"
+                    >
+                      {key}
                     </Link>
                   </>
                 )}

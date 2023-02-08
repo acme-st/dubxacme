@@ -27,8 +27,8 @@ export default function FeedbackEmail({
           <MjmlSection cssClass="smooth">
             <MjmlColumn>
               <MjmlText cssClass="paragraph">
-                New feedback from{" "}
-                {email ? <strong>{email}</strong> : "a acme.st user"}:
+                새 피드백 from{" "}
+                {email ? <strong>{email}</strong> : "a Acme.st user"}:
               </MjmlText>
               <MjmlText cssClass="paragraph">{feedback}</MjmlText>
               <Divider />

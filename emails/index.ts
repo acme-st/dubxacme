@@ -10,7 +10,7 @@ const sendMail = buildSendMail({
       pass: process.env.POSTMARK_API_KEY,
     },
   }),
-  defaultFrom: "Acme.ST <acmest@biblic.net>",
+  defaultFrom: "ACME.ST <acmest@biblic.net>",
   configPath: "./mailing.config.json",
 });
 
@@ -25,6 +25,6 @@ export const sendMarketingMail = buildSendMail({
       pass: process.env.POSTMARK_MARKETING_API_SECRET,
     },
   }),
-  defaultFrom: "Acme.ST <acmest@biblic.net>",
+  defaultFrom: "Acme.st <acmest@biblic.net>",
   configPath: "./mailing.config.json",
 });

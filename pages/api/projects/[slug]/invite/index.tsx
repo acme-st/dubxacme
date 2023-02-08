@@ -18,7 +18,7 @@ export default withProjectAuth(
     if (!slug || typeof slug !== "string") {
       return res
         .status(400)
-        .json({ error: "Missing or misconfigured project slug" });
+        .json({ error: "프로젝트 슬러그 누락 및 오류" });
     }
 
     // GET /api/projects/[slug]/invite - Get all pending invites for a project
@@ -54,7 +54,7 @@ export default withProjectAuth(
       if (alreadyInTeam) {
         return res
           .status(400)
-          .json({ error: "User already exists in this project" });
+          .json({ error: "사용자가 이미 이 프로젝트에 있습니다." });
       }
 
       // same method of generating a token as next-auth
@@ -91,7 +91,7 @@ export default withProjectAuth(
         const url = `${process.env.NEXTAUTH_URL}/api/auth/callback/email?${params}`;
 
         sendMail({
-          subject: "You've been invited to join a project on ACMEST",
+          subject: "애크미쇼트너 프로젝트에 초대합니다.",
           to: email,
           component: <ProjectInvite url={url} projectName={project.name} />,
         });

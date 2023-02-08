@@ -13,7 +13,7 @@ interface MarkerProps {
   size: number;
 }
 
-export default function Globe({ domain }: { domain?: string }) {
+export default function Globe() {
   const divRef = useRef<any>();
   const entry = useIntersectionObserver(divRef, {});
   const isVisible = !!entry?.isIntersecting;
@@ -30,7 +30,7 @@ export default function Globe({ domain }: { domain?: string }) {
   const [webglSupported, setWebglSupported] = useState(true);
 
   const { data: markers } = useSWR<MarkerProps[]>(
-    `/api/edge/coordinates${domain ? `?domain=${domain}` : ""}`,
+    `/api/edge/coordinates`,
     fetcher,
   );
 
@@ -55,20 +55,12 @@ export default function Globe({ domain }: { domain?: string }) {
         webglSupported ? "min-h-[500px] sm:min-h-[1000px]" : "min-h-[50px]"
       } h-full`}
     >
-      {webglSupported && showGlobe && (
-        <GlobeAnimation domain={domain} markers={markers} />
-      )}
+      {webglSupported && showGlobe && <GlobeAnimation markers={markers} />}
     </div>
   );
 }
 
-const GlobeAnimation = ({
-  domain,
-  markers,
-}: {
-  domain?: string;
-  markers: MarkerProps[];
-}) => {
+const GlobeAnimation = ({ markers }: { markers: MarkerProps[] }) => {
   const canvasRef = useRef<any>();
   const pointerInteracting = useRef(null);
   const pointerInteractionMovement = useRef(0);
@@ -137,34 +129,31 @@ const GlobeAnimation = ({
               autoFocus={false}
               onClick={() => setShowModal(false)}
             >
-              <span className="sr-only">Spin Globe</span>
+              <span className="sr-only">지구 회전</span>
               <X className="h-4 w-4" />
             </button>
             <Drag className="mx-auto mb-2 h-12 w-12 text-gray-700 sm:mb-4" />
             <p className="text-center text-sm text-gray-700 sm:text-base">
-              This map shows the locations of the last 50 clicks on{" "}
+              이 지도에서 링크{" "}
               <a
                 className="font-semibold text-blue-800"
-                href={domain ? `https://${domain}` : "https://acme.st/biblic"}
+                href="https://biblic.net"
                 target="_blank"
                 rel="noreferrer"
               >
-                {domain || "acme.st/biblic"}
+                acme.st/biblic
               </a>{" "}
-              in real time.
+              의 최근 50 클릭의 위치 정보를 실시간 확인하세요.
             </p>
-            {!domain && (
-              <Link
-                href={{ pathname: "/", query: { key: "biblic" } }}
-                as="/stats/biblic"
-                shallow
-                scroll={false}
-              >
-                <a className="mx-auto mt-2 block max-w-fit rounded-full border border-black bg-black px-4 py-1.5 text-sm text-white hover:bg-white hover:text-black sm:mt-4">
-                  View all stats
-                </a>
-              </Link>
-            )}
+            <Link
+              href={{ pathname: "/", query: { key: "github" } }}
+              as="/stats/github"
+              shallow
+              scroll={false}
+              className="mx-auto mt-2 block max-w-fit rounded-full border border-black bg-black px-4 py-1.5 text-sm text-white hover:bg-white hover:text-black sm:mt-4"
+            >
+              전체 통계 보기
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

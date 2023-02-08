@@ -25,8 +25,7 @@ export function FeedbackEmail() {
   return (
     <FeedbackEmailChild
       email="acmest@biblic.net"
-      feedback="This is a 
-test feedback email"
+      feedback="이거슨 테스트 피드백 이메일"
     />
   );
 }

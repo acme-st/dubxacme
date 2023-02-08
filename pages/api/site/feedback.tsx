@@ -10,19 +10,22 @@ export default async function handler(
   if (req.method === "POST") {
     const { success } = await ratelimit.limit("feedback");
     if (!success) {
-      res.status(429).json({ error: "Don't DDoS me pls 🥺" });
+      res.status(429).json({ error: "잠시 멈추고 다시 생각해 보세요 🥹" });
     }
 
     const { email, feedback } = req.body;
+    if (email === "prewarm") {
+      return res.status(200).json({ response: "pre-warmed" });
+    }
     if (!feedback) {
-      return res.status(400).json({ error: "Missing feedback" });
+      return res.status(400).json({ error: "피드백을 까먹었어요 😟" });
     }
 
     const response = await sendMail({
       to: "acmest@biblic.net",
       from: "acmest@biblic.net",
       ...(email && { replyTo: email }),
-      subject: "🎉 New Feedback Received!",
+      subject: "💌 새 피드백 도착!",
       component: <FeedbackEmail email={email} feedback={feedback} />,
     });
     res.status(200).json({ response });

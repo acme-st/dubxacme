@@ -6,17 +6,17 @@ import Popover from "@/components/shared/popover";
 
 const statuses = [
   {
-    display: "Active",
+    display: "활성",
     slug: "active",
     color: "bg-green-500",
   },
   {
-    display: "Expired",
+    display: "만료",
     slug: "expired",
     color: "bg-amber-500",
   },
   {
-    display: "Archived",
+    display: "보관",
     slug: "archived",
     color: "bg-gray-400",
   },
@@ -107,7 +107,7 @@ export default function StatusFilter() {
       >
         <div className="flex items-center space-x-2 text-gray-700">
           <IconMenu
-            text="Status"
+            text="상태"
             icon={
               <div className="flex -space-x-1">
                 {statuses.map(({ slug, color }) => (

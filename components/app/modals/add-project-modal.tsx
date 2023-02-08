@@ -13,14 +13,16 @@ import { useDebounce } from "use-debounce";
 import BlurImage from "@/components/shared/blur-image";
 import { AlertCircleFill, LoadingDots } from "@/components/shared/icons";
 import Modal from "@/components/shared/modal";
-import { generateSlugFromName } from "@/lib/utils";
+import { generateDomainFromName } from "@/lib/utils";
 
 function AddProjectModalHelper({
   showAddProjectModal,
   setShowAddProjectModal,
+  closeWithX,
 }: {
   showAddProjectModal: boolean;
   setShowAddProjectModal: Dispatch<SetStateAction<boolean>>;
+  closeWithX?: boolean;
 }) {
   const router = useRouter();
 
@@ -41,19 +43,21 @@ function AddProjectModalHelper({
 
   const [debouncedSlug] = useDebounce(slug, 500);
   useEffect(() => {
-    if (debouncedSlug.length > 0 && !slugError) {
+    if (debouncedSlug.length > 0) {
       fetch(`/api/projects/${slug}/exists`).then(async (res) => {
         if (res.status === 200) {
           const exists = await res.json();
-          setSlugError(exists === 1 ? "Slug is already in use." : null);
+          setSlugError(exists === 1 ? "이미 사용 중인 슬러그 입니다." : null);
         }
       });
+    } else {
+      setSlugError(null);
     }
   }, [debouncedSlug, slugError]);
 
   const [debouncedDomain] = useDebounce(domain, 500);
   useEffect(() => {
-    if (debouncedDomain.length > 0 && !domainError) {
+    if (debouncedDomain.length > 0) {
       fetch(`/api/projects/acme.st/domains/${debouncedDomain}/exists`).then(
         async (res) => {
           if (res.status === 200) {
@@ -62,14 +66,19 @@ function AddProjectModalHelper({
           }
         },
       );
+    } else {
+      setDomainError(null);
     }
   }, [debouncedDomain, domainError]);
 
   useEffect(() => {
     setData((prev) => ({
       ...prev,
-      slug: name.toLowerCase().replaceAll(" ", "-"),
-      domain: generateSlugFromName(name),
+      slug: name
+        .toLowerCase()
+        .trim()
+        .replace(/[\W_]+/g, "-"),
+      domain: generateDomainFromName(name),
     }));
   }, [name]);
 
@@ -77,6 +86,7 @@ function AddProjectModalHelper({
     <Modal
       showModal={showAddProjectModal}
       setShowModal={setShowAddProjectModal}
+      closeWithX={closeWithX}
     >
       <div className="inline-block w-full transform overflow-hidden bg-white align-middle shadow-xl transition-all sm:max-w-md sm:rounded-2xl sm:border sm:border-gray-200">
         <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 px-4 py-4 pt-8 sm:px-16">
@@ -87,7 +97,7 @@ function AddProjectModalHelper({
             width={20}
             height={20}
           />
-          <h3 className="text-lg font-medium">Add a new project</h3>
+          <h3 className="text-lg font-medium">새 프로젝트 추가</h3>
         </div>
 
         <form
@@ -128,7 +138,7 @@ function AddProjectModalHelper({
               htmlFor="name"
               className="block text-sm font-medium text-gray-700"
             >
-              Project Name
+              프로젝트 이름
             </label>
             <div className="mt-1 flex rounded-md shadow-sm">
               <input
@@ -137,7 +147,7 @@ function AddProjectModalHelper({
                 type="text"
                 required
                 className="block w-full rounded-md border-gray-300 text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
-                placeholder="ACMEST"
+                placeholder="AcmeShorTener"
                 value={name}
                 onChange={(e) => {
                   setData({ ...data, name: e.target.value });
@@ -152,7 +162,7 @@ function AddProjectModalHelper({
               htmlFor="slug"
               className="block text-sm font-medium text-gray-700"
             >
-              Project Slug
+              프로젝트 슬러그
             </label>
             <div className="relative mt-1 flex rounded-md shadow-sm">
               <span className="inline-flex items-center rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-5 text-gray-500 sm:text-sm">
@@ -169,7 +179,7 @@ function AddProjectModalHelper({
                     ? "border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500"
                     : "border-gray-300 text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:ring-gray-500"
                 } block w-full rounded-r-md pr-10 focus:outline-none sm:text-sm`}
-                placeholder="ACMEST"
+                placeholder="acme"
                 value={slug}
                 onChange={(e) => {
                   setSlugError(null);
@@ -198,7 +208,7 @@ function AddProjectModalHelper({
               htmlFor="domain"
               className="block text-sm font-medium text-gray-700"
             >
-              Domain
+              단축링크 도메인
             </label>
             <div className="relative mt-1 flex rounded-md shadow-sm">
               <input
@@ -232,14 +242,14 @@ function AddProjectModalHelper({
             {domainError &&
               (domainError === "Domain is already in use." ? (
                 <p className="mt-2 text-sm text-red-600" id="domain-error">
-                  Domain is already in use.{" "}
+                  이미 사용 중인 도메인입니다. 이 도메인 사용을 희망한다면 문의해 주세요{" "}
                   <a
                     className="underline"
                     href="mailto:acmest@biblic.net?subject=My Domain Is Already In Use"
                   >
-                    Contact us
+                    문의
                   </a>{" "}
-                  if you'd like to use this domain for your project.
+                  해주세요
                 </p>
               ) : (
                 <p className="mt-2 text-sm text-red-600" id="domain-error">
@@ -256,7 +266,7 @@ function AddProjectModalHelper({
                 : "border-black bg-black text-white hover:bg-white hover:text-black"
             } flex h-10 w-full items-center justify-center rounded-md border text-sm transition-all focus:outline-none`}
           >
-            {saving ? <LoadingDots color="#808080" /> : <p>Add project</p>}
+            {saving ? <LoadingDots color="#808080" /> : <p>프로젝트 추가</p>}
           </button>
         </form>
       </div>
@@ -264,7 +274,7 @@ function AddProjectModalHelper({
   );
 }
 
-export function useAddProjectModal({ domain }: { domain?: string }) {
+export function useAddProjectModal({ closeWithX }: { closeWithX?: boolean }) {
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
 
   const AddProjectModal = useCallback(() => {
@@ -272,9 +282,10 @@ export function useAddProjectModal({ domain }: { domain?: string }) {
       <AddProjectModalHelper
         showAddProjectModal={showAddProjectModal}
         setShowAddProjectModal={setShowAddProjectModal}
+        closeWithX={closeWithX}
       />
     );
-  }, [showAddProjectModal, setShowAddProjectModal, domain]);
+  }, [showAddProjectModal, setShowAddProjectModal, closeWithX]);
 
   return useMemo(
     () => ({ setShowAddProjectModal, AddProjectModal }),

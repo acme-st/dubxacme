@@ -31,21 +31,22 @@ export default function ProjectSettingsPeople() {
       <div className="rounded-lg border border-gray-200 bg-white">
         <div className="flex flex-col items-center justify-between space-y-3 p-5 sm:flex-row sm:space-y-0 sm:p-10">
           <div className="flex flex-col space-y-3">
-            <h2 className="text-xl font-medium">People</h2>
+            <h2 className="text-xl font-medium">팀멤버</h2>
             <p className="text-sm text-gray-500">
-              Teammates or friends that have access to this project.
+              이 프로젝트에 접근할 수 있습니다.
             </p>
           </div>
           <button
             onClick={() => setShowInviteTeammateModal(true)}
             className="h-9 w-full rounded-md border border-black bg-black px-6 text-sm text-white transition-all duration-150 ease-in-out hover:bg-white hover:text-black focus:outline-none sm:w-auto"
           >
-            Invite
+            초대
           </button>
         </div>
         <div className="flex space-x-3 border-b border-gray-200 px-3 sm:px-7">
           {tabs.map((tab) => (
             <div
+              key={tab}
               className={`${
                 tab === currentTab ? "border-black" : "border-transparent"
               } border-b py-1`}
@@ -63,7 +64,10 @@ export default function ProjectSettingsPeople() {
           {users ? (
             users.length > 0 ? (
               users.map(({ name, email, joinedAt }) => (
-                <div className="flex items-center justify-between space-x-3 px-4 py-3 sm:px-8">
+                <div
+                  key={email}
+                  className="flex items-center justify-between space-x-3 px-4 py-3 sm:px-8"
+                >
                   <div className="flex items-center space-x-3">
                     <BlurImage
                       src={`https://avatars.dicebear.com/api/micah/${email}.svg`}
@@ -92,7 +96,7 @@ export default function ProjectSettingsPeople() {
                   height={300}
                   className="pointer-events-none -my-8"
                 />
-                <p className="text-sm text-gray-500">No invitations sent</p>
+                <p className="text-sm text-gray-500">초대가 없습니다.</p>
               </div>
             )
           ) : (

@@ -1,187 +1,206 @@
-import { Dispatch, SetStateAction, useCallback, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { motion } from "framer-motion";
 import TextareaAutosize from "react-textarea-autosize";
 import BlurImage from "@/components/shared/blur-image";
 import { LoadingCircle, UploadCloud } from "@/components/shared/icons";
 import { LinkProps } from "@/lib/types";
-import { AnimationSettings } from "./advanced-settings";
+import Switch from "@/components/shared/switch";
+import { FADE_IN_ANIMATION_SETTINGS } from "@/lib/constants";
 
 export default function OGSection({
+  props,
   data,
   setData,
+  generatingMetatags,
 }: {
+  props: LinkProps;
   data: LinkProps;
   setData: Dispatch<SetStateAction<LinkProps>>;
+  generatingMetatags: boolean;
 }) {
-  const [generatingTitle, setGeneratingTitle] = useState(false);
-  const [generatingDescription, setGeneratingDescription] = useState(false);
+  const { title, description, image, proxy } = data;
 
-  const { url, title, description, image } = data;
-
-  const generateTitleFromUrl = async () => {
-    setGeneratingTitle(true);
-    fetch(`/api/edge/title?url=${url}`).then(async (res) => {
-      if (res.status === 200) {
-        const results = await res.json();
-        setData((prev) => ({ ...prev, title: results }));
-        setGeneratingTitle(false);
-      }
-    });
-  };
-
-  const generateDescriptionFromUrl = async () => {
-    setGeneratingDescription(true);
-    fetch(`/api/edge/description?url=${url}`).then(async (res) => {
-      if (res.status === 200) {
-        const results = await res.json();
-        setData((prev) => ({ ...prev, description: results }));
-        setGeneratingDescription(false);
-      }
-    });
-  };
+  const [fileSizeTooBig, setFileSizeTooBig] = useState(false);
 
   const onChangePicture = useCallback(
     (e) => {
+      setFileSizeTooBig(false);
       const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setData((prev) => ({ ...prev, image: e.target.result as string }));
-      };
-      reader.readAsDataURL(file);
+      if (file) {
+        if (file.size / 1024 / 1024 > 1) {
+          setFileSizeTooBig(true);
+        } else {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            setData((prev) => ({ ...prev, image: e.target.result as string }));
+          };
+          reader.readAsDataURL(file);
+        }
+      }
     },
     [setData],
   );
+
+  useEffect(() => {
+    if (proxy && props) {
+      // if custom OG is enabled
+      setData((prev) => ({
+        ...prev,
+        title: props.title || title,
+        description: props.description || description,
+        image: props.image || image,
+      }));
+    }
+  }, [proxy]);
+
+  const randomIdx = Math.floor(Math.random() * 100);
+
   return (
-    <motion.div key="og" className="grid gap-5" {...AnimationSettings}>
-      <p className="mt-2 block px-5 text-sm text-gray-500">
-        If you use custom OG tags,{" "}
-        <span className="font-semibold text-black">
-          be sure to set all 3 tags
-        </span>
-        , or the default tags of the target URL will be used.
-      </p>
-      <div className="border-t border-gray-200 px-5 pt-5 pb-2.5">
-        <div className="flex items-center justify-between">
-          <label
-            htmlFor="title"
-            className="block text-sm font-medium text-gray-700"
-          >
-            OG Title
-          </label>
-          <button
-            className={`${
-              url.length === 0
-                ? "cursor-not-allowed text-gray-300"
-                : "hover:text-black active:scale-95"
-            } flex items-center space-x-2 text-sm text-gray-500 transition-all duration-75`}
-            onClick={() => generateTitleFromUrl()}
-            disabled={url.length === 0 || generatingTitle}
-            type="button"
-          >
-            {generatingTitle && <LoadingCircle />}
-            <p>{generatingTitle ? "Generating" : "Generate from URL"}</p>
-          </button>
-        </div>
-        <div className="mt-1 flex rounded-md shadow-sm">
-          <TextareaAutosize
-            name="title"
-            id="title"
-            minRows={3}
-            className="block w-full rounded-md border-gray-300 pr-10 text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
-            placeholder="ACMEST - Acme ShorTner"
-            value={title || ""}
-            onChange={(e) => {
-              setData({ ...data, title: e.target.value });
-            }}
-            aria-invalid="true"
-          />
-        </div>
+    <div className="grid gap-5 border-b border-gray-200 pb-5">
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-medium text-gray-900">
+          커스텀 소셜 미디어 카드
+        </h2>
+        <Switch
+          fn={() => setData((prev) => ({ ...prev, proxy: !proxy }))}
+          checked={proxy}
+        />
       </div>
 
-      <div className="border-t border-gray-200 px-5 pt-5 pb-2.5">
-        <div className="flex items-center justify-between">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-gray-700"
-          >
-            OG Description
-          </label>
-          <button
-            className={`${
-              url.length === 0
-                ? "cursor-not-allowed text-gray-300"
-                : "hover:text-black active:scale-95"
-            } flex items-center space-x-2 text-sm text-gray-500 transition-all duration-75`}
-            onClick={() => generateDescriptionFromUrl()}
-            disabled={url.length === 0 || generatingDescription}
-            type="button"
-          >
-            {generatingDescription && <LoadingCircle />}
-            <p>{generatingDescription ? "Generating" : "Generate from URL"}</p>
-          </button>
-        </div>
-        <div className="mt-1 flex rounded-md shadow-sm">
-          <TextareaAutosize
-            name="description"
-            id="description"
-            minRows={3}
-            className="block w-full rounded-md border-gray-300 pr-10 text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
-            placeholder="cs + free custom domains."
-            value={description || ""}
-            onChange={(e) => {
-              setData({
-                ...data,
-                description:
-                  e.target.value.length > 0 ? e.target.value : undefined,
-              });
-            }}
-            aria-invalid="true"
-          />
-        </div>
-      </div>
-
-      <div className="border-t border-gray-200 px-5 pt-5 pb-2.5">
-        <p className="block text-sm font-medium text-gray-700">OG Image</p>
-        <label
-          htmlFor="image"
-          className="group mt-1 flex h-[10.5rem] cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50"
+      {proxy && (
+        <motion.div
+          key="og-options"
+          {...FADE_IN_ANIMATION_SETTINGS}
+          className="grid gap-5"
         >
-          {image ? (
-            typeof image === "string" ? (
-              <BlurImage
-                src={image}
-                alt="Preview"
-                width={1200}
-                height={627}
-                className="h-full w-full rounded-md object-cover transition-all hover:brightness-95"
+          <div>
+            <div className="flex items-center justify-between">
+              <p className="block text-sm font-medium text-gray-700">이미지</p>
+              {fileSizeTooBig && (
+                <p className="text-sm text-red-500">
+                  파일 크기가 너무 큽니다 (최대 1MB)
+                </p>
+              )}
+            </div>
+            <label
+              htmlFor={`image-${randomIdx}`}
+              className="group relative mt-1 flex h-[14rem] cursor-pointer flex-col items-center justify-center rounded-md border border-gray-300 bg-white shadow-sm transition-all hover:bg-gray-50"
+            >
+              {generatingMetatags && (
+                <div className="absolute z-[5] flex h-full w-full items-center justify-center rounded-md bg-white">
+                  <LoadingCircle />
+                </div>
+              )}
+              <div
+                className={`absolute z-[3] flex h-full w-full flex-col items-center justify-center rounded-md transition-all ${
+                  image
+                    ? "bg-white/80 opacity-0 hover:opacity-100 hover:backdrop-blur-md"
+                    : "bg-white opacity-100 hover:bg-gray-50"
+                }`}
+              >
+                <UploadCloud className="h-7 w-7 text-gray-500 transition-all duration-75 group-hover:scale-110 group-active:scale-95" />
+                <p className="mt-2 text-sm text-gray-500">
+                  추천 사이즈 : 1200 x 627 픽셀
+                </p>
+                <span className="sr-only">OG Image 업로드</span>
+              </div>
+              {image &&
+                (image.startsWith("https://res.cloudinary.com") ? (
+                  <BlurImage
+                    src={image}
+                    alt="Preview"
+                    width={1200}
+                    height={627}
+                    className="h-full w-full rounded-md object-cover"
+                  />
+                ) : (
+                  <img
+                    src={image}
+                    alt="Preview"
+                    className="h-full w-full rounded-md object-cover"
+                  />
+                ))}
+            </label>
+            <div className="mt-1 flex rounded-md shadow-sm">
+              <input
+                id={`image-${randomIdx}`}
+                name="image"
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={onChangePicture}
               />
-            ) : (
-              <img
-                src={image}
-                alt="Preview"
-                className="h-full w-full rounded-md object-cover transition-all hover:brightness-95"
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <p className="block text-sm font-medium text-gray-700">제목</p>
+              <p className="text-sm text-gray-500">{title?.length || 0}/120</p>
+            </div>
+            <div className="relative mt-1 flex rounded-md shadow-sm">
+              {generatingMetatags && (
+                <div className="absolute flex h-full w-full items-center justify-center rounded-md border border-gray-300 bg-white">
+                  <LoadingCircle />
+                </div>
+              )}
+              <TextareaAutosize
+                name="title"
+                id={`title-${randomIdx}`}
+                minRows={3}
+                maxLength={120}
+                className="block w-full rounded-md border-gray-300 pr-10 text-sm text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                placeholder="Acme.ST - Link Shortening Simplified"
+                value={title || ""}
+                onChange={(e) => {
+                  setData({ ...data, title: e.target.value });
+                }}
+                aria-invalid="true"
               />
-            )
-          ) : (
-            <>
-              <UploadCloud className="h-7 w-7 text-gray-500 transition-all duration-75 group-hover:scale-110 group-active:scale-95" />
-              <p className="mt-2 text-sm text-gray-500">
-                Recommended: 1200 x 627 pixels
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between">
+              <p className="block text-sm font-medium text-gray-700">
+                설명
               </p>
-              <span className="sr-only">OG Image upload</span>
-            </>
-          )}
-        </label>
-        <div className="mt-1 flex rounded-md shadow-sm">
-          <input
-            id="image"
-            name="image"
-            type="file"
-            className="sr-only"
-            onChange={onChangePicture}
-          />
-        </div>
-      </div>
-    </motion.div>
+              <p className="text-sm text-gray-500">
+                {description?.length || 0}/240
+              </p>
+            </div>
+            <div className="relative mt-1 flex rounded-md shadow-sm">
+              {generatingMetatags && (
+                <div className="absolute flex h-full w-full items-center justify-center rounded-md border border-gray-300 bg-white">
+                  <LoadingCircle />
+                </div>
+              )}
+              <TextareaAutosize
+                name="description"
+                id={`description-${randomIdx}`}
+                minRows={3}
+                maxLength={240}
+                className="block w-full rounded-md border-gray-300 pr-10 text-sm text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                placeholder="애크미쇼트너는 콘텐츠와 마케팅 전문팀을 위한 통합 링크 관리 서비스로 링크단축, 생성, 공유, 추적, 통계 모든 과정을 제공합니다."
+                value={description || ""}
+                onChange={(e) => {
+                  setData({
+                    ...data,
+                    description: e.target.value,
+                  });
+                }}
+                aria-invalid="true"
+              />
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </div>
   );
 }

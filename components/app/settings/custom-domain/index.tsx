@@ -37,9 +37,9 @@ export default function CustomDomain() {
     <div className="max-w-full rounded-lg border border-gray-200 bg-white py-5 sm:py-10">
       {domain && <EditDomainModal />}
       <div className="flex flex-col space-y-3 px-5 sm:px-10">
-        <h2 className="text-xl font-medium">Custom Domain</h2>
+        <h2 className="text-xl font-medium">커스텀 도메인</h2>
         <p className="text-sm text-gray-500">
-          This is the custom domain associated with your project.
+          프로젝트에 연결된 도메인
         </p>
       </div>
       <div className="my-4 border-b border-gray-200 sm:my-8" />
@@ -73,7 +73,7 @@ export default function CustomDomain() {
                     : "bg-white hover:border-black hover:text-black"
                 } h-9 w-24 rounded-md border border-solid border-gray-200 text-sm text-gray-500 transition-all duration-150 ease-in-out focus:outline-none`}
               >
-                {isValidating ? <LoadingDots /> : "Refresh"}
+                {isValidating ? <LoadingDots /> : "새로고침"}
               </button>
             ) : (
               <div className="h-9 w-24 animate-pulse rounded-md bg-gray-200" />
@@ -83,7 +83,7 @@ export default function CustomDomain() {
                 onClick={() => setShowEditDomainModal(true)}
                 className="h-9 w-24 rounded-md border border-solid border-black bg-black text-sm text-white transition-all duration-150 ease-in-out hover:bg-white hover:text-black focus:outline-none"
               >
-                Change
+                변경
               </button>
             ) : (
               <div className="h-9 w-24 animate-pulse rounded-md bg-gray-200" />

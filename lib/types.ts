@@ -12,9 +12,13 @@ export interface LinkProps {
   expiresAt: Date | null;
   password: string | null;
 
+  proxy: boolean;
   title: string | null;
   description: string | null;
   image: string | null;
+
+  ios: string | null;
+  android: string | null;
 
   clicks: number;
   userId: string;
@@ -61,3 +65,8 @@ export type DomainVerificationStatusProps =
   | "Pending Verification"
   | "Domain Not Found"
   | "Unknown Error";
+
+export interface RootDomainProps {
+  target: string;
+  rewrite?: boolean;
+}

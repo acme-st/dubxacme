@@ -18,23 +18,23 @@ export default function App() {
 
   return (
     <AppLayout>
-      {data && <AddProjectModal />}
+      <AddProjectModal />
       <div className="flex h-36 items-center border-b border-gray-200 bg-white">
         <MaxWidthWrapper>
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl text-gray-600">My Projects</h1>
+            <h1 className="text-2xl text-gray-600">나의 프로젝트</h1>
             {plan === "Free" && data?.length >= FREE_PLAN_PROJECT_LIMIT ? (
               <Tooltip
                 content={
                   <TooltipContent
-                    title={`You can only have ${FREE_PLAN_PROJECT_LIMIT} projects on the Free plan. Upgrade to the Pro plan create more.`}
-                    cta="Upgrade"
+                    title={`무료플랜의 프로젝트 한도는 ${FREE_PLAN_PROJECT_LIMIT} 입니다. 더 추가하려면 프로플랜으로 업그레이드 하세요.`}
+                    cta="업그레이드"
                     ctaLink={`/settings`}
                   />
                 }
               >
                 <div className="cursor-not-allowed rounded-md border border-gray-200 px-5 py-2 text-sm font-medium text-gray-300 transition-all duration-75">
-                  Add
+                  추가
                 </div>
               </Tooltip>
             ) : (
@@ -42,7 +42,7 @@ export default function App() {
                 onClick={() => setShowAddProjectModal(true)}
                 className="rounded-md border border-black bg-black px-5 py-2 text-sm font-medium text-white transition-all duration-75 hover:bg-white hover:text-black active:scale-95"
               >
-                Add
+                추가
               </button>
             )}
           </div>

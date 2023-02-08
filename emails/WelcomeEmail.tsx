@@ -19,7 +19,7 @@ export default function WelcomeEmail({ name }: { name?: string }): JSX.Element {
       <Head />
       <MjmlBody width={500}>
         <MjmlWrapper cssClass="container">
-          <Header title="Welcome to ACMEST" />
+          <Header title="Welcome to ACME.ST" />
           <MjmlSection padding="0">
             <MjmlColumn>
               <MjmlImage
@@ -33,26 +33,27 @@ export default function WelcomeEmail({ name }: { name?: string }): JSX.Element {
           <MjmlSection cssClass="smooth">
             <MjmlColumn>
               <MjmlText cssClass="paragraph">
-                Thanks for signing up{name && `, ${name}`}!
+                어서오세요.{name && `, ${name}`}님!
               </MjmlText>
               <MjmlText cssClass="paragraph">
-              Acme.st - ACME ShorTner. I'm excited to have you on board!
+                애크미쇼트너(ACME.ShorTener)는
+                콘텐츠와 마케팅 전문팀을 위한 통합 링크 관리 서비스로 링크단축, 생성, 공유, 추적, 통계 모든 과정을 제공합니다.
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                Here are a few things you can do:
+                몇 가지 기능을 소개합니다.:
               </MjmlText>
               <MjmlText cssClass="li">
-                •&nbsp;&nbsp;Create a custom{" "}
+                •&nbsp;&nbsp;나만의 브랜드{" "}
                 <a href="https://app.acme.st/links" target="_blank">
-                  acme.st short link
+                  Acme.st 단축 링크
                 </a>
               </MjmlText>
               <MjmlText cssClass="li">
-                •&nbsp;&nbsp;Create a new{" "}
+                •&nbsp;&nbsp;새 프로젝트{" "}
                 <a href="https://app.acme.st/" target="_blank">
-                  project
+                  만들기
                 </a>{" "}
-                and add your custom domain
+                그리고 나의 보유 도메인 추가하기
               </MjmlText>
               <MjmlText cssClass="li">
                 •&nbsp;&nbsp;Star the repo on{" "}
@@ -67,14 +68,10 @@ export default function WelcomeEmail({ name }: { name?: string }): JSX.Element {
                 </a>
               </MjmlText>
               <MjmlText cssClass="paragraph">
-                Let me know if you have any questions or feedback. I'm always
-                happy to help!
+                피드백과 제안을 항상 기다립니다.
               </MjmlText>
               <MjmlText cssClass="paragraph" color={grayDark}>
-               Thanks,
-              </MjmlText>
-              <MjmlText cssClass="paragraph" color={grayDark}>
-              Acme.st - ACME ShorTner
+                애크미쇼트너 ACME.ST
               </MjmlText>
               <Divider />
             </MjmlColumn>

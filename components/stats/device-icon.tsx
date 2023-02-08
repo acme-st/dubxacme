@@ -1,5 +1,5 @@
 import BlurImage from "@/components/shared/blur-image";
-import { Apple, Chrome, Safari } from "components/shared/icons/devices";
+import { Apple, Chrome, Safari } from "@/components/shared/icons/devices";
 import { DeviceTabs } from "@/lib/stats";
 
 export default function DeviceIcon({
@@ -26,7 +26,7 @@ export default function DeviceIcon({
         src={
           display === "Desktop"
             ? `https://faisalman.github.io/ua-parser-js/images/types/default.png`
-            : `https://faisalman.github.io/ua-parser-js/images/types/${display}.png`
+            : `https://faisalman.github.io/ua-parser-js/images/types/${display.toLowerCase()}.png`
         }
         alt={display}
         width={20}

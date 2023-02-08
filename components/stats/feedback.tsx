@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import TextareaAutosize from "react-textarea-autosize";
 import LoadingDots from "@/components/shared/icons/loading-dots";
 import { CheckCircleFill } from "../shared/icons";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function Feedback() {
   const { data: session } = useSession();
@@ -33,10 +33,28 @@ export default function Feedback() {
     }
   };
 
+  // Pre-warm the API endpoint to avoid cold start
+  // Ideally we'd use an edge function for this but
+  // node-mailer is not edge compatible
+  const prewarm = useDebouncedCallback(
+    () => {
+      fetch("/api/site/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: "prewarm",
+          feedback: null,
+        }),
+      });
+    },
+    30000,
+    { leading: true },
+  );
+
   return (
     <div className="relative h-[420px] overflow-scroll border border-gray-200 bg-white px-7 py-5 scrollbar-hide sm:rounded-lg sm:border-gray-100 sm:shadow-lg">
       <div className="mb-5 flex">
-        <h1 className="text-xl font-semibold">Feedback</h1>
+        <h1 className="text-xl font-semibold">피드백</h1>
       </div>
       <AnimatePresence>
         {state === "submitted" ? (
@@ -46,7 +64,7 @@ export default function Feedback() {
             animate={{ opacity: 1, y: 0 }}
           >
             <CheckCircleFill className="h-10 w-10 text-green-500" />
-            <p className="text-gray-500">Thank you for your feedback!</p>
+            <p className="text-gray-500">소중한 의견 감사합니다!</p>
           </motion.div>
         ) : (
           <motion.form
@@ -60,13 +78,14 @@ export default function Feedback() {
                 htmlFor="email"
                 className="mb-2 block text-xs font-medium text-gray-500"
               >
-                EMAIL
+                이메일
               </label>
               <input
                 name="email"
                 type="email"
-                placeholder="acmest@biblic.net"
+                placeholder="acmest@acme.st"
                 autoComplete="email"
+                onFocus={prewarm}
                 onChange={(e) => setData({ ...data, email: e.target.value })}
                 className="block w-full rounded-md border-gray-300 pr-10 text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
               />
@@ -76,17 +95,18 @@ export default function Feedback() {
                 htmlFor="feedback"
                 className="mb-2 block text-xs font-medium text-gray-500"
               >
-                FEEDBACK
+                내용
               </label>
-              <TextareaAutosize
+              <textarea
                 name="feedback"
                 id="feedback"
-                minRows={5}
                 required={true}
+                rows={6}
                 onKeyDown={handleKeyDown}
                 className="block w-full rounded-md border-gray-300 pr-10 text-gray-900 placeholder-gray-300 focus:border-gray-500 focus:outline-none focus:ring-gray-500 sm:text-sm"
-                placeholder="What other data would you like to see?"
+                placeholder="무엇이든 남겨주세요."
                 value={data.feedback}
+                onFocus={prewarm}
                 onChange={(e) => setData({ ...data, feedback: e.target.value })}
                 aria-invalid="true"
               />
@@ -102,7 +122,7 @@ export default function Feedback() {
               {state === "submitting" ? (
                 <LoadingDots color="#808080" />
               ) : (
-                <p>Submit feedback</p>
+                <p>보내기</p>
               )}
             </button>
           </motion.form>

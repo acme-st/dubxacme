@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react";
 import Meta from "@/components/layout/meta";
 import BlurImage from "@/components/shared/blur-image";
 import { LoadingDots } from "@/components/shared/icons";
+import Background from "@/components/shared/background";
 
 export default function Login() {
   const [signInClicked, setSignInClicked] = useState(false);
@@ -13,21 +14,22 @@ export default function Login() {
 
   return (
     <div className="flex h-screen w-screen items-center justify-center bg-gray-50">
-      <Meta />
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
+      <Meta title="Sign in to ACME.ST" />
+      <Background />
+      <div className="z-10 w-full max-w-md overflow-hidden rounded-2xl border border-gray-100 shadow-xl">
         <div className="flex flex-col items-center justify-center space-y-3 border-b border-gray-200 bg-white px-4 py-6 pt-8 text-center sm:px-16">
           <a href="https://acme.st">
             <BlurImage
               src="/_static/logo.png"
-              alt="acme.st logo"
+              alt="Acme.st logo"
               className="h-10 w-10 rounded-full"
               width={20}
               height={20}
             />
           </a>
-          <h3 className="text-xl font-semibold">Sign In</h3>
+          <h3 className="text-xl font-semibold">로그인</h3>
           <p className="text-sm text-gray-500">
-            Use your email address to sign in.
+            이메일 주소로 로그인 하세요.
           </p>
         </div>
         <form
@@ -47,6 +49,7 @@ export default function Login() {
                 }).then((res) => {
                   setSignInClicked(false);
                   if (res?.ok && !res?.error) {
+                    setEmail("");
                     setButtonText("Email sent - check your inbox!");
                   } else {
                     setButtonText("Error sending email - try again?");
@@ -62,15 +65,16 @@ export default function Login() {
         >
           <div>
             <label htmlFor="email" className="block text-xs text-gray-600">
-              EMAIL ADDRESS
+              이메일 주소
             </label>
             <input
               id="email"
               name="email"
               type="email"
-              placeholder="acmest@biblic.net"
+              placeholder="acmest@acme.st"
               autoComplete="email"
               required
+              value={email}
               onChange={(e) => {
                 setNoSuchAccount(false);
                 setEmail(e.target.value);
@@ -94,19 +98,19 @@ export default function Login() {
           </button>
           {noSuchAccount ? (
             <p className="text-center text-sm text-red-500">
-              No such account.{" "}
-              <Link href="/register">
-                <a className="font-semibold text-red-600">Sign up</a>
+              계정이 존재하지 않습니다.{" "}
+              <Link href="/register" className="font-semibold text-red-600">
+                가입
               </Link>{" "}
-              instead?
+              하시겠어요?
             </p>
           ) : (
             <p className="text-center text-sm text-gray-600">
-              Don't have an account?{" "}
-              <Link href="/register">
-                <a className="font-semibold text-gray-800">Sign up</a>
+              아직 계정이 없다면{" "}
+              <Link href="/register" className="font-semibold text-gray-800">
+                무료 가입
               </Link>{" "}
-              for free.
+              해주세요.
             </p>
           )}
         </form>

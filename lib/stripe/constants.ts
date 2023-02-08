@@ -4,7 +4,7 @@ export const getPlanFromUsageLimit = (usageLimit: number) => {
 
 export const PRO_TIERS = [
   {
-    name: "Pro 10K",
+    name: "프로 1만",
     quota: 10000,
     price: {
       monthly: {
@@ -24,7 +24,7 @@ export const PRO_TIERS = [
     },
   },
   {
-    name: "Pro 25K",
+    name: "프로 2.5만",
     quota: 25000,
     price: {
       monthly: {
@@ -44,7 +44,7 @@ export const PRO_TIERS = [
     },
   },
   {
-    name: "Pro 50K",
+    name: "프로 5만",
     quota: 50000,
     price: {
       monthly: {
@@ -64,7 +64,7 @@ export const PRO_TIERS = [
     },
   },
   {
-    name: "Pro 100K",
+    name: "프로 10만",
     quota: 100000,
     price: {
       monthly: {
@@ -84,7 +84,7 @@ export const PRO_TIERS = [
     },
   },
   {
-    name: "Pro 500K",
+    name: "프로 50만",
     quota: 500000,
     price: {
       monthly: {
@@ -104,7 +104,7 @@ export const PRO_TIERS = [
     },
   },
   {
-    name: "Pro 1M",
+    name: "프로 100만",
     quota: 1000000,
     price: {
       monthly: {

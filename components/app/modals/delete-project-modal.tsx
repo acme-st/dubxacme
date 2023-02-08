@@ -39,10 +39,9 @@ function DeleteProjectModal({
             width={20}
             height={20}
           />
-          <h3 className="text-lg font-medium">Delete Project</h3>
+          <h3 className="text-lg font-medium">프로젝트 삭제</h3>
           <p className="text-center text-sm text-gray-500">
-            Warning: This will permanently delete your project, custom domain,
-            and all associated links + their stats.
+            주의: 프로젝트, 커스텀 도메인 그리고 모든 링크와 통계가 완전히 삭제됩니다.
           </p>
         </div>
 
@@ -76,9 +75,9 @@ function DeleteProjectModal({
               htmlFor="project-slug"
               className="block text-sm font-medium text-gray-700"
             >
-              Enter the project slug{" "}
-              <span className="font-semibold text-black">{slug}</span> to
-              continue:
+              계속하려면 프로젝트 슬러그 {" "}
+              <span className="font-semibold text-black">{slug}</span>를
+              입력해 주세요:
             </label>
             <div className="relative mt-1 rounded-md shadow-sm">
               <input
@@ -97,11 +96,11 @@ function DeleteProjectModal({
               htmlFor="verification"
               className="block text-sm text-gray-700"
             >
-              To verify, type{" "}
+              확인을 위해{" "}
               <span className="font-semibold text-black">
                 confirm delete project
               </span>{" "}
-              below
+              를 입력해 주세요.
             </label>
             <div className="relative mt-1 rounded-md shadow-sm">
               <input
@@ -127,7 +126,7 @@ function DeleteProjectModal({
             {deleting ? (
               <LoadingDots color="#808080" />
             ) : (
-              <p>Confirm delete project</p>
+              <p>프로젝트 삭제 확인</p>
             )}
           </button>
         </form>

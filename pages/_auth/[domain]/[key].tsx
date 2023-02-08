@@ -37,7 +37,7 @@ export default function PasswordProtectedLinkPage() {
             <a href="https://acme.st" target="_blank" rel="noreferrer">
               <BlurImage
                 src="/_static/logo.png"
-                alt="acme.st logo"
+                alt="Acme.st logo"
                 className="h-10 w-10 rounded-full"
                 width={20}
                 height={20}
@@ -74,7 +74,7 @@ export default function PasswordProtectedLinkPage() {
           >
             <div>
               <label htmlFor="password" className="block text-xs text-gray-600">
-                PASSWORD
+                비밀번호
               </label>
               <div className="relative mt-1 rounded-md shadow-sm">
                 <input
@@ -103,7 +103,7 @@ export default function PasswordProtectedLinkPage() {
               </div>
               {error && (
                 <p className="mt-2 text-sm text-red-600" id="slug-error">
-                  Incorrect password
+                  잘못된 비밀번호
                 </p>
               )}
             </div>
@@ -119,7 +119,7 @@ export default function PasswordProtectedLinkPage() {
               {validating ? (
                 <LoadingDots color="#808080" />
               ) : (
-                <p>Authenticate</p>
+                <p>인증</p>
               )}
             </button>
           </form>

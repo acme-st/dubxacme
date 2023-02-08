@@ -46,9 +46,9 @@ export default function PlanUsage() {
     <div className="rounded-lg border border-gray-200 bg-white">
       <UpgradePlanModal />
       <div className="flex flex-col space-y-3 p-10">
-        <h2 className="text-xl font-medium">Plan &amp; Usage</h2>
+        <h2 className="text-xl font-medium">플랜 &amp; 사용량</h2>
         <p className="text-sm text-gray-500">
-          You are currently on the{" "}
+          현재 이용 중인 플랜은{" "}
           {plan ? (
             <span
               className={`capitalize ${
@@ -63,14 +63,14 @@ export default function PlanUsage() {
             </span>
           ) : (
             <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-200">
-              load
+              로드
             </span>
           )}{" "}
-          plan.
+          플랜.
           {billingStart && billingEnd && (
             <>
               {" "}
-              Current billing cycle:{" "}
+              현재 결제 주기:{" "}
               <span className="font-medium text-black">
                 {billingStart} - {billingEnd}
               </span>
@@ -83,7 +83,7 @@ export default function PlanUsage() {
       <div className="grid grid-cols-1 divide-y divide-gray-200 sm:grid-cols-2 sm:divide-y-0 sm:divide-x">
         <div className="flex flex-col space-y-2 p-10">
           <div className="flex items-center">
-            <h3 className="font-medium">Total Link Clicks</h3>
+            <h3 className="font-medium">총 링크클릭</h3>
             <Tooltip content="Number of billable link clicks across all your projects.">
               <div className="flex h-4 w-8 justify-center">
                 <QuestionCircle className="h-4 w-4 text-gray-600" />
@@ -92,7 +92,7 @@ export default function PlanUsage() {
           </div>
           {!loading ? (
             <p className="text-sm text-gray-600">
-              {nFormatter(usage)} / {nFormatter(usageLimit)} clicks (
+              {nFormatter(usage)} / {nFormatter(usageLimit)} 클릭 (
               {((usage / usageLimit) * 100).toFixed(1)}%)
             </p>
           ) : (
@@ -112,7 +112,7 @@ export default function PlanUsage() {
           </div>
         </div>
         <div className="p-10">
-          <h3 className="font-medium">Number of Projects</h3>
+          <h3 className="font-medium">프로젝트 수</h3>
           <div className="mt-4 flex items-center">
             {projectCount ? (
               <p className="text-2xl font-semibold text-black">
@@ -131,7 +131,7 @@ export default function PlanUsage() {
         {plan ? (
           plan === "Pro 1M" ? (
             <p className="text-sm text-gray-500">
-              For higher limits, contact us to upgrade to the Enterprise plan.
+              더 높은 사용량이 필요하다면 엔터프라이즈 플랜을 문의해 주세요.
             </p>
           ) : (
             <p className="text-sm text-gray-500">
@@ -160,7 +160,7 @@ export default function PlanUsage() {
               }}
               className="h-9 w-24 rounded-md border border-blue-500 bg-blue-500 text-sm text-white transition-all duration-150 ease-in-out hover:bg-white hover:text-blue-500 focus:outline-none"
             >
-              Upgrade
+              업그레이드
             </button>
           ) : (
             <div className="flex space-x-3">
@@ -169,7 +169,7 @@ export default function PlanUsage() {
                   href="mailto:acmest@biblic.net?subject=Upgrade%20to%20Enterprise%20Plan"
                   className="flex h-9 w-24 items-center justify-center rounded-md border border-violet-600 bg-violet-600 text-sm text-white transition-all duration-150 ease-in-out hover:bg-white hover:text-violet-600 focus:outline-none"
                 >
-                  Contact Us
+                  문의하기
                 </a>
               )}
               <button
